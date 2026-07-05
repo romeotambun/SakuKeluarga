@@ -5,9 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SakuKeluarga - Hub Keuangan Keluarga</title>
   
+  <!-- Tailwind CSS & FontAwesome Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js for premium analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Google Font: Inter & JetBrains Mono -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
@@ -67,7 +72,7 @@
 </head>
 <body class="h-full overflow-hidden">
 
-  <!-- ALERT MODAL -->
+  <!-- ALERT DIALOG -->
   <div id="customAlertModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
     <div class="custom-modal-box max-w-sm w-full p-6 rounded-2xl shadow-2xl scale-95 border text-center">
       <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl" id="customAlertIconBg">
@@ -80,12 +85,10 @@
     </div>
   </div>
 
-  <!-- CONFIRMATION MODAL -->
+  <!-- CONFIRMATION DIALOG -->
   <div id="customConfirmModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
     <div class="custom-modal-box max-w-sm w-full p-6 rounded-2xl shadow-2xl scale-95 border">
-      <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-      </div>
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20"><i class="fa-solid fa-triangle-exclamation"></i></div>
       <h3 id="customConfirmTitle" class="text-lg font-bold tracking-tight text-center mb-2 text-primary-theme">Butuh Konfirmasi</h3>
       <p id="customConfirmMessage" class="text-xs text-secondary-theme text-center mb-6 leading-relaxed font-semibold"></p>
       <div class="grid grid-cols-2 gap-3">
@@ -98,7 +101,7 @@
   <!-- EDIT POCKET MODAL -->
   <div id="editPocketModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
     <div class="custom-modal-box max-w-md w-full p-6 rounded-2xl shadow-2xl border">
-      <h3 class="text-base font-bold tracking-tight mb-4 border-b pb-2 text-primary-theme"><i class="fa-solid fa-edit text-blue-500 mr-2"></i>Edit Kantong</h3>
+      <h3 class="text-base font-bold tracking-tight mb-4 border-b pb-2 text-primary-theme"><i class="fa-solid fa-edit text-blue-500 mr-2"></i>Edit Kantong Keuangan</h3>
       <input type="hidden" id="editPocketOldName">
       <div class="space-y-4">
         <div>
@@ -138,7 +141,7 @@
       </div>
       <div class="grid grid-cols-2 gap-3 mt-6">
         <button onclick="closeEditPocketModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl font-bold text-xs uppercase border border-slate-700">Batal</button>
-        <button onclick="saveEditPocket()" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase">Simpan</button>
+        <button onclick="saveEditPocket()" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase">Simpan Perubahan</button>
       </div>
     </div>
   </div>
@@ -158,14 +161,14 @@
         <div>
           <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-secondary-theme">Redistribusi Persentase (%):</label>
           <select id="deletePocketRedistribute" class="w-full premium-input py-2.5 px-3 text-xs font-bold rounded-xl">
-            <option value="target">Gabungkan ke Penerima</option>
-            <option value="split">Bagi Rata ke Seluruh Kantong</option>
+            <option value="target">Gabungkan Persentase ke Kantong Penerima</option>
+            <option value="split">Bagi Rata Sisa Persentase ke Seluruh Kantong Aktif</option>
           </select>
         </div>
       </div>
       <div class="grid grid-cols-2 gap-3 mt-6">
         <button onclick="closeDeletePocketModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl font-bold text-xs uppercase border border-slate-700">Batal</button>
-        <button onclick="executeDeleteAndReallocate()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase">Proses</button>
+        <button onclick="executeDeleteAndReallocate()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase">Proses Hapus & Gabung</button>
       </div>
     </div>
   </div>
@@ -189,7 +192,7 @@
         </div>
         <div>
           <div class="flex justify-between items-center mb-1">
-            <label class="block text-[10px] font-bold uppercase tracking-wider text-secondary-theme">Jumlah Nominal</label>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-secondary-theme">Jumlah Nominal Transaksi</label>
             <span id="editTxAmountFormatted" class="text-[9px] font-bold font-monospace text-blue-400">Rp 0</span>
           </div>
           <div class="relative">
@@ -204,7 +207,7 @@
       </div>
       <div class="grid grid-cols-2 gap-3 mt-6">
         <button onclick="closeEditTransactionModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl font-bold text-xs uppercase border border-slate-700">Batal</button>
-        <button onclick="saveEditTransaction()" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase">Simpan</button>
+        <button onclick="saveEditTransaction()" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase">Simpan Perubahan</button>
       </div>
     </div>
   </div>
@@ -225,7 +228,7 @@
         </div>
 
         <h3 id="authTitle" class="text-xs font-bold mb-4 text-slate-300 border-b border-slate-800 pb-2 flex items-center gap-2 uppercase tracking-wider">
-          <i class="fa-solid fa-shield-halved text-blue-500"></i> Masuk
+          <i class="fa-solid fa-shield-halved text-blue-500"></i> Masuk Saku Keluarga
         </h3>
         
         <div class="space-y-4 mb-6">
@@ -233,7 +236,7 @@
             <label class="block text-slate-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider">Email</label>
             <div class="relative">
               <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500"><i class="fa-solid fa-envelope"></i></span>
-              <input type="email" id="email" class="w-full pl-10 pr-4 py-2.5 rounded-xl premium-input font-monospace text-xs" required>
+              <input type="email" id="email" class="w-full pl-10 pr-4 py-2.5 rounded-xl premium-input font-monospace text-xs" placeholder="saya@gmail.com" required>
             </div>
           </div>
 
@@ -241,7 +244,7 @@
             <label class="block text-slate-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider">Kata Sandi</label>
             <div class="relative">
               <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500"><i class="fa-solid fa-lock"></i></span>
-              <input type="password" id="password" class="w-full pl-10 pr-10 py-2.5 rounded-xl premium-input font-monospace text-xs">
+              <input type="password" id="password" class="w-full pl-10 pr-10 py-2.5 rounded-xl premium-input font-monospace text-xs" placeholder="••••••••">
               <button type="button" onclick="togglePasswordVisibility('password', 'passwordToggleIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500">
                 <i id="passwordToggleIcon" class="fa-solid fa-eye"></i>
               </button>
@@ -250,17 +253,17 @@
 
           <div id="resetFieldsGroup" class="hidden space-y-4">
             <div class="border-t border-slate-800/60 pt-3">
-              <label class="block text-amber-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider">Kode OTP</label>
+              <label class="block text-amber-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider">Kode OTP 6-Digit (Cek Email)</label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-500"><i class="fa-solid fa-key"></i></span>
-                <input type="text" id="resetOTP" class="w-full pl-10 pr-4 py-2.5 rounded-xl premium-input font-monospace text-xs text-center text-amber-400 font-bold" maxlength="6">
+                <input type="text" id="resetOTP" class="w-full pl-10 pr-4 py-2.5 rounded-xl premium-input font-monospace text-xs tracking-widest text-center text-amber-400 font-bold" placeholder="000000" maxlength="6">
               </div>
             </div>
             <div>
               <label class="block text-slate-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider">Kata Sandi Baru</label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500"><i class="fa-solid fa-lock"></i></span>
-                <input type="password" id="newPassword" class="w-full pl-10 pr-10 py-2.5 rounded-xl premium-input font-monospace text-xs">
+                <input type="password" id="newPassword" class="w-full pl-10 pr-10 py-2.5 rounded-xl premium-input font-monospace text-xs" placeholder="••••••••">
                 <button type="button" onclick="togglePasswordVisibility('newPassword', 'newPasswordToggleIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500">
                   <i id="newPasswordToggleIcon" class="fa-solid fa-eye"></i>
                 </button>
@@ -279,11 +282,11 @@
         
         <div id="registerButtons" class="space-y-3 hidden">
           <button type="submit" class="w-full btn-gradient-emerald text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider">Buat Account</button>
-          <p class="text-[10px] text-center font-semibold text-slate-400">Sudah bergabung? <a href="#" onclick="switchAuthState('login')" class="text-blue-400 font-bold hover:underline">Login SakuKeluarga</a></p>
+          <p class="text-[10px] text-center font-semibold text-slate-400">Sudah bergabung? <a href="#" onclick="switchAuthState('login')" class="text-blue-400 font-bold hover:underline">Login Hub</a></p>
         </div>
 
         <div id="forgotButtons" class="space-y-3 hidden">
-          <button type="button" onclick="sendPasswordResetCode()" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider">Kirim Kode OTP Ke Email</button>
+          <button type="button" onclick="sendPasswordResetCode()" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider">Kirim Kode OTP</button>
           <button type="button" onclick="executeResetPassword()" id="btnExecuteReset" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hidden">Setel Ulang Kata Sandi</button>
           <p class="text-[10px] text-center font-semibold text-slate-400"><a href="#" onclick="switchAuthState('login')" class="text-slate-300 hover:underline">Kembali ke Login</a></p>
         </div>
@@ -336,8 +339,11 @@
           </button>
         </nav>
       </div>
+
       <div class="p-3 border-t border-slate-800/40">
-        <button onclick="logout()" class="w-full bg-red-950/20 hover:bg-red-950/40 border border-red-900/40 text-red-400 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-power-off mr-1.5"></i> Keluar</button>
+        <button onclick="logout()" class="w-full bg-red-950/20 hover:bg-red-950/40 border border-red-900/40 text-red-400 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider">
+          <i class="fa-solid fa-power-off mr-1.5"></i> Keluar
+        </button>
       </div>
     </aside>
 
@@ -345,21 +351,29 @@
     <main class="flex-grow flex flex-col min-w-0 h-full overflow-hidden">
       <header class="h-14 border-b flex items-center justify-between px-4 sm:px-6 flex-shrink-0 relative z-10">
         <div class="flex items-center space-x-3">
-          <button onclick="toggleMobileSidebar()" class="lg:hidden p-1.5 text-slate-400 bg-slate-800/20 border border-slate-700/10 rounded-lg"><i class="fa-solid fa-bars text-sm"></i></button>
+          <button onclick="toggleMobileSidebar()" class="lg:hidden p-1.5 text-slate-400 hover:text-white bg-slate-800/20 border border-slate-700/10 rounded-lg">
+            <i class="fa-solid fa-bars text-sm"></i>
+          </button>
           <h2 id="pageTitle" class="text-[10px] font-bold uppercase tracking-widest border-l-2 border-blue-500 pl-3">IKHTISAR SAKU</h2>
-          <span id="demoBadge" class="hidden px-2 py-0.5 bg-amber-500/10 text-amber-400 text-[8px] font-bold border border-amber-500/20 rounded uppercase">MODE DEMO</span>
+          <span id="demoBadge" class="hidden px-2 py-0.5 bg-amber-500/10 text-amber-400 text-[8px] font-bold border border-amber-500/20 rounded uppercase">MODE DEMO LOKAL</span>
         </div>
+        
         <div class="flex items-center space-x-4">
           <button onclick="toggleTheme()" id="themeToggleBtn" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition text-[10px] font-bold uppercase">
             <i class="fa-solid fa-moon text-amber-400"></i> <span id="themeToggleText">MODE GELAP</span>
           </button>
-          <div class="text-[10px] flex items-center space-x-1.5 font-semibold uppercase"><i class="fa-solid fa-calendar-day text-blue-400"></i> <span id="currentDate">-</span></div>
+          <div class="text-[10px] flex items-center space-x-1.5 font-semibold uppercase">
+            <i class="fa-solid fa-calendar-day text-blue-400"></i> <span id="currentDate">-</span>
+          </div>
         </div>
       </header>
 
       <div class="flex-1 overflow-y-auto p-4 sm:p-5 relative">
         <div id="alertBox" class="hidden bg-red-950/60 border border-red-500/40 text-red-200 p-3.5 rounded-xl mb-4 flex items-center justify-between shadow-lg">
-          <div class="flex items-center space-x-2.5"><div class="w-7 h-7 rounded-lg bg-red-500 text-black font-extrabold flex items-center justify-center text-xs">⚠️</div><p id="alertMsg" class="text-[10px] font-medium uppercase tracking-wide leading-relaxed"></p></div>
+          <div class="flex items-center space-x-2.5">
+            <div class="w-7 h-7 rounded-lg bg-red-500 text-black font-extrabold flex items-center justify-center text-xs">⚠️</div>
+            <p id="alertMsg" class="text-[10px] font-medium uppercase tracking-wide leading-relaxed"></p>
+          </div>
           <button onclick="document.getElementById('alertBox').classList.add('hidden')" class="text-red-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
@@ -367,19 +381,31 @@
         <section id="tab-dashboard" class="tab-content space-y-5">
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <div class="premium-panel p-3.5 rounded-xl flex items-center justify-between">
-              <div><p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Total Saldo</p><p class="text-xs sm:text-base font-extrabold mt-0.5 font-monospace truncate" id="metricTotalBalance">Rp 0</p></div>
+              <div>
+                <p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Total Saldo</p>
+                <p class="text-xs sm:text-base font-extrabold mt-0.5 font-monospace truncate" id="metricTotalBalance">Rp 0</p>
+              </div>
               <div class="w-7 h-7 rounded-lg bg-blue-950/20 text-blue-400 border flex items-center justify-center text-xs"><i class="fa-solid fa-building-columns"></i></div>
             </div>
             <div class="premium-panel p-3.5 rounded-xl flex items-center justify-between">
-              <div><p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Pemasukan</p><p class="text-xs sm:text-base font-extrabold text-emerald-400 mt-0.5 font-monospace truncate" id="metricTotalIncome">Rp 0</p></div>
+              <div>
+                <p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Pemasukan</p>
+                <p class="text-xs sm:text-base font-extrabold text-emerald-400 mt-0.5 font-monospace truncate" id="metricTotalIncome">Rp 0</p>
+              </div>
               <div class="w-7 h-7 rounded-lg bg-emerald-950/20 text-emerald-400 border flex items-center justify-center text-xs"><i class="fa-solid fa-circle-arrow-up"></i></div>
             </div>
             <div class="premium-panel p-3.5 rounded-xl flex items-center justify-between">
-              <div><p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Pengeluaran</p><p class="text-xs sm:text-base font-extrabold text-pink-500 mt-0.5 font-monospace truncate" id="metricTotalExpense">Rp 0</p></div>
+              <div>
+                <p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Pengeluaran</p>
+                <p class="text-xs sm:text-base font-extrabold text-pink-500 mt-0.5 font-monospace truncate" id="metricTotalExpense">Rp 0</p>
+              </div>
               <div class="w-7 h-7 rounded-lg bg-pink-950/20 text-pink-500 border flex items-center justify-center text-xs"><i class="fa-solid fa-circle-arrow-down"></i></div>
             </div>
             <div class="premium-panel p-3.5 rounded-xl flex items-center justify-between">
-              <div><p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Konfigurasi</p><p class="text-xs sm:text-base font-extrabold text-amber-400 mt-0.5 font-monospace truncate" id="metricTotalPercent">0% / 100%</p></div>
+              <div>
+                <p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Konfigurasi</p>
+                <p class="text-xs sm:text-base font-extrabold text-amber-400 mt-0.5 font-monospace truncate" id="metricTotalPercent">0% / 100%</p>
+              </div>
               <div class="w-7 h-7 rounded-lg bg-amber-950/20 text-amber-400 border flex items-center justify-center text-xs"><i class="fa-solid fa-percentage"></i></div>
             </div>
           </div>
@@ -388,7 +414,9 @@
             <!-- Form Input -->
             <div class="premium-panel p-4 sm:p-5 rounded-xl flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between border-b pb-2 mb-3"><h3 class="text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-pen-to-square mr-1.5 text-blue-500"></i>Catat Transaksi</h3></div>
+                <div class="flex items-center justify-between border-b pb-2 mb-3">
+                  <h3 class="text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-pen-to-square mr-1.5 text-blue-500"></i>Catat Transaksi</h3>
+                </div>
                 <div class="space-y-3">
                   <div>
                     <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Jenis Aliran</label>
@@ -412,8 +440,8 @@
                     </div>
                   </div>
                   <div>
-                    <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Catatan</label>
-                    <input type="text" id="txNotes" class="w-full py-1.5 px-2.5 premium-input text-[10px] font-semibold rounded-lg" placeholder="misal: Gaji bulanan">
+                    <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Detil / Catatan</label>
+                    <input type="text" id="txNotes" class="w-full py-1.5 px-2.5 premium-input text-[10px] font-semibold rounded-lg" placeholder="misal: Belanja bulanan">
                   </div>
                 </div>
               </div>
@@ -424,15 +452,28 @@
 
             <!-- Chart -->
             <div class="premium-panel p-4 sm:p-5 rounded-xl xl:col-span-2 flex flex-col justify-between">
-              <div class="flex items-center justify-between border-b pb-2 mb-3"><h3 class="text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-chart-line mr-1.5 text-pink-500"></i>Analisis Komparasi Budget vs Realisasi</h3></div>
+              <div class="flex items-center justify-between border-b pb-2 mb-3">
+                <h3 class="text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-chart-line mr-1.5 text-pink-500"></i>Analisis Komparasi Budget vs Realisasi</h3>
+              </div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                <div class="relative h-44 sm:h-48 flex items-center justify-center"><canvas id="pocketDonutChart"></canvas></div>
+                <div class="relative h-44 sm:h-48 flex items-center justify-center">
+                  <canvas id="pocketDonutChart"></canvas>
+                </div>
                 <div class="space-y-3">
                   <div class="bg-black/20 p-3 border rounded-xl space-y-2">
-                    <div class="flex justify-between text-[10px]"><span class="font-semibold uppercase text-slate-400">Total Budget:</span><span class="font-bold font-monospace text-blue-400" id="statTotalBudget">Rp 0</span></div>
-                    <div class="flex justify-between text-[10px]"><span class="font-semibold uppercase text-slate-400">Total Actual:</span><span class="font-bold font-monospace text-pink-500" id="statTotalActual">Rp 0</span></div>
+                    <div class="flex justify-between text-[10px]">
+                      <span class="font-semibold uppercase text-slate-400">Total Budget:</span>
+                      <span class="font-bold font-monospace text-blue-400" id="statTotalBudget">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between text-[10px]">
+                      <span class="font-semibold uppercase text-slate-400">Total Actual:</span>
+                      <span class="font-bold font-monospace text-pink-500" id="statTotalActual">Rp 0</span>
+                    </div>
                     <div class="border-t border-slate-700/50 my-1"></div>
-                    <div class="flex justify-between text-[10px]"><span class="font-semibold uppercase text-slate-400">Penyerapan:</span><span class="font-bold font-monospace" id="statUtilRate">0%</span></div>
+                    <div class="flex justify-between text-[10px]">
+                      <span class="font-semibold uppercase text-slate-400">Penyerapan:</span>
+                      <span class="font-bold font-monospace" id="statUtilRate">0%</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -440,7 +481,9 @@
           </div>
 
           <div>
-            <div class="flex items-center justify-between border-b pb-2 mb-4"><h3 class="text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-wallet mr-1.5 text-emerald-400"></i>Daftar Saku Keluarga</h3></div>
+            <div class="flex items-center justify-between border-b pb-2 mb-4">
+              <h3 class="text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-wallet mr-1.5 text-emerald-400"></i>Daftar Saku Keluarga</h3>
+            </div>
             <div id="pocketList" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5"></div>
           </div>
         </section>
@@ -449,23 +492,30 @@
         <section id="tab-transactions" class="tab-content hidden space-y-5">
           <div class="premium-panel p-4 sm:p-5 rounded-xl h-full flex flex-col justify-between">
             <div class="flex flex-col xl:flex-row xl:items-center justify-between border-b pb-3 mb-4 gap-4">
-              <div><h3 class="text-[10px] font-bold uppercase tracking-widest">Buku Kas Utama</h3></div>
+              <div>
+                <h3 class="text-[10px] font-bold uppercase tracking-widest">Buku Kas Utama</h3>
+              </div>
               <div class="flex flex-wrap items-center gap-2.5">
                 <div class="flex items-center gap-1.5 border-slate-700/50">
                   <select id="exportMonth" class="premium-input text-[9px] font-bold rounded-lg py-1 px-2">
-                    <option value="all">Semua Bulan</option><option value="0">Januari</option><option value="1">Februari</option><option value="2">Maret</option>
-                    <option value="3">April</option><option value="4">Mei</option><option value="5">Juni</option><option value="6">Juli</option>
-                    <option value="7">Agustus</option><option value="8">September</option><option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
+                    <option value="all">Semua Bulan</option>
+                    <option value="0">Januari</option><option value="1">Februari</option><option value="2">Maret</option>
+                    <option value="3">April</option><option value="4">Mei</option><option value="5">Juni</option>
+                    <option value="6">Juli</option><option value="7">Agustus</option><option value="8">September</option>
+                    <option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
                   </select>
                   <select id="exportYear" class="premium-input text-[9px] font-bold rounded-lg py-1 px-2">
-                    <option value="all">Semua Tahun</option><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option>
+                    <option value="all">Semua Tahun</option>
+                    <option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option>
                   </select>
                   <button onclick="downloadCSVReport()" class="bg-emerald-600 text-white text-[9px] font-bold py-1 px-2.5 rounded-lg">CSV</button>
                 </div>
                 <div class="flex gap-2 w-full sm:w-auto">
                   <input type="text" id="txSearch" oninput="resetPageAndFilter()" class="premium-input text-[10px] font-semibold rounded-lg py-1.5 px-3 placeholder-slate-500" placeholder="Cari...">
                   <select id="txFilterType" onchange="resetPageAndFilter()" class="premium-input text-[10px] font-semibold rounded-lg py-1.5 px-3">
-                    <option value="Semua">Semua Aliran</option><option value="Pemasukan">Pemasukan (+)</option><option value="Pengeluaran">Pengeluaran (-)</option>
+                    <option value="Semua">Semua Aliran</option>
+                    <option value="Pemasukan">Pemasukan (+)</option>
+                    <option value="Pengeluaran">Pengeluaran (-)</option>
                   </select>
                 </div>
               </div>
@@ -476,8 +526,12 @@
                 <table class="w-full text-left border-collapse min-w-[600px] md:min-w-0">
                   <thead class="sticky top-0 z-10 bg-[#0d1424]">
                     <tr class="bg-black/40 border-b text-[9px] uppercase font-bold tracking-widest">
-                      <th class="py-2.5 px-3 border-r">Waktu</th><th class="py-2.5 px-3 border-r">Jenis</th><th class="py-2.5 px-3 border-r">Saku Alokasi</th>
-                      <th class="py-2.5 px-3 border-r text-right">Nominal</th><th class="py-2.5 px-3 border-r">Catatan</th><th class="py-2.5 px-3 text-center">Aksi</th>
+                      <th class="py-2.5 px-3 border-r">Waktu</th>
+                      <th class="py-2.5 px-3 border-r">Jenis</th>
+                      <th class="py-2.5 px-3 border-r">Saku Alokasi</th>
+                      <th class="py-2.5 px-3 border-r text-right">Nominal</th>
+                      <th class="py-2.5 px-3 border-r">Catatan</th>
+                      <th class="py-2.5 px-3 text-center">Aksi</th>
                     </tr>
                   </thead>
                   <tbody id="transactionTableBody" class="text-[10px] divide-y divide-slate-800/20"></tbody>
@@ -496,20 +550,45 @@
         <section id="tab-pockets" class="tab-content hidden space-y-5">
           <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
             <div class="premium-panel p-5 rounded-xl h-fit">
-              <div class="border-b pb-2 mb-3"><h3 class="text-[10px] font-bold uppercase tracking-widest">Buat Saku Kustom</h3></div>
+              <div class="border-b pb-2 mb-3">
+                <h3 class="text-[10px] font-bold uppercase tracking-widest">Buat Saku Kustom</h3>
+              </div>
               <div class="space-y-3">
-                <div><label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Nama Saku</label><input type="text" id="pocketNewName" class="w-full py-1.5 px-2.5 premium-input text-[10px] font-bold rounded-lg"></div>
-                <div><label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Porsi Alokasi (%)</label><input type="number" id="pocketNewPercentage" class="w-full py-1.5 px-2.5 premium-input text-[10px] font-bold rounded-lg font-monospace"></div>
+                <div>
+                  <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Nama Saku</label>
+                  <input type="text" id="pocketNewName" class="w-full py-1.5 px-2.5 premium-input text-[10px] font-bold rounded-lg">
+                </div>
+                <div>
+                  <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Porsi Alokasi (%)</label>
+                  <input type="number" id="pocketNewPercentage" class="w-full py-1.5 px-2.5 premium-input text-[10px] font-bold rounded-lg font-monospace">
+                </div>
                 <div class="grid grid-cols-2 gap-3">
-                  <div><label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Ikon</label><select id="pocketNewIcon" class="w-full premium-input py-1.5 px-2 text-[10px] font-bold rounded-lg"><option value="fa-solid fa-house">🏠 Rumah Tangga</option><option value="fa-solid fa-cart-shopping">🛒 Belanja</option><option value="fa-solid fa-gamepad">🎮 Hiburan</option><option value="fa-solid fa-piggy-bank">🐷 Tabungan</option></select></div>
-                  <div><label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Warna</label><select id="pocketNewColor" class="w-full premium-input py-1.5 px-2 text-[10px] font-bold rounded-lg"><option value="#3b82f6">Ocean Blue</option><option value="#10b981">Emerald Green</option><option value="#ec4899">Pink Rose</option></select></div>
+                  <div>
+                    <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Ikon</label>
+                    <select id="pocketNewIcon" class="w-full premium-input py-1.5 px-2 text-[10px] font-bold rounded-lg">
+                      <option value="fa-solid fa-house">🏠 Rumah Tangga</option>
+                      <option value="fa-solid fa-cart-shopping">🛒 Belanja</option>
+                      <option value="fa-solid fa-gamepad">🎮 Hiburan</option>
+                      <option value="fa-solid fa-piggy-bank">🐷 Tabungan</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Warna</label>
+                    <select id="pocketNewColor" class="w-full premium-input py-1.5 px-2 text-[10px] font-bold rounded-lg">
+                      <option value="#3b82f6">Ocean Blue</option>
+                      <option value="#10b981">Emerald Green</option>
+                      <option value="#ec4899">Pink Rose</option>
+                    </select>
+                  </div>
                 </div>
                 <button onclick="createCustomPocket()" class="w-full btn-gradient-emerald text-white py-2 font-bold uppercase text-[10px] rounded-lg">Simpan Saku</button>
               </div>
             </div>
 
             <div class="premium-panel p-5 rounded-xl xl:col-span-2">
-              <div class="border-b pb-2 mb-4"><h3 class="text-[10px] font-bold uppercase tracking-widest">Struktur Distribusi Saku Aktif</h3></div>
+              <div class="border-b pb-2 mb-4">
+                <h3 class="text-[10px] font-bold uppercase tracking-widest">Struktur Distribusi Saku Aktif</h3>
+              </div>
               <div class="space-y-2.5 max-h-[350px] overflow-y-auto" id="pocketConfigList"></div>
             </div>
           </div>
@@ -518,15 +597,29 @@
         <!-- TAB: TRANSFER -->
         <section id="tab-transfer" class="tab-content hidden space-y-5">
           <div class="premium-panel p-6 max-w-lg mx-auto rounded-xl">
-            <div class="border-b pb-2 mb-4 text-center"><h3 class="text-[10px] font-bold uppercase tracking-widest">Pindah Saldo Antar Saku</h3></div>
+            <div class="border-b pb-2 mb-4 text-center">
+              <h3 class="text-[10px] font-bold uppercase tracking-widest">Pindah Saldo Antar Saku</h3>
+            </div>
             <div class="space-y-4">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div><label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Saku Pengirim</label><select id="transferSource" class="w-full premium-input py-1.5 px-2.5 text-[10px] font-bold rounded-lg"></select></div>
-                <div><label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Saku Penerima</label><select id="transferTarget" class="w-full premium-input py-1.5 px-2.5 text-[10px] font-bold rounded-lg"></select></div>
+                <div>
+                  <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Saku Pengirim</label>
+                  <select id="transferSource" class="w-full premium-input py-1.5 px-2.5 text-[10px] font-bold rounded-lg"></select>
+                </div>
+                <div>
+                  <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Saku Penerima</label>
+                  <select id="transferTarget" class="w-full premium-input py-1.5 px-2.5 text-[10px] font-bold rounded-lg"></select>
+                </div>
               </div>
               <div>
-                <div class="flex justify-between items-center mb-1"><label class="block text-[8px] font-bold uppercase tracking-wider">Nominal Transfer (Rp)</label><span id="transferAmountFormatted" class="text-[9px] font-bold font-monospace text-blue-400">Rp 0</span></div>
-                <div class="relative"><span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-blue-400 text-[10px] font-bold font-monospace">Rp</span><input type="number" id="transferAmount" oninput="liveFormatCurrency('transferAmount', 'transferAmountFormatted')" class="w-full pl-8 pr-2.5 py-1.5 premium-input text-[10px] font-bold rounded-lg font-monospace"></div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="block text-[8px] font-bold uppercase tracking-wider">Nominal Transfer (Rp)</label>
+                  <span id="transferAmountFormatted" class="text-[9px] font-bold font-monospace text-blue-400">Rp 0</span>
+                </div>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-blue-400 text-[10px] font-bold font-monospace">Rp</span>
+                  <input type="number" id="transferAmount" oninput="liveFormatCurrency('transferAmount', 'transferAmountFormatted')" class="w-full pl-8 pr-2.5 py-1.5 premium-input text-[10px] font-bold rounded-lg font-monospace">
+                </div>
               </div>
               <button onclick="handleTransfer()" class="w-full btn-gradient-blue text-white py-2 font-bold uppercase text-[10px] rounded-lg">Eksekusi Transfer</button>
             </div>
@@ -538,11 +631,10 @@
 
   <script>
     // =========================================================================
-    // 1. PASTE URL WEB APP HASIL DEPLOY GOOGLE APPS SCRIPT ANDA DI BAWAH INI:
+    // ⚠️ MASUKKAN URL HASIL NEW DEPLOYMENT APPS SCRIPT-MU DI BAWAH INI:
     // =========================================================================
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwmb3D13MyZC_0QB7pUXAi4AMOSjXXLjx5Govhh71IPhNr_0sDABZ5AGE9ri_rOrUNb/exec"; 
 
-    // KUNCI LOCAL STORAGE (MENGHINDARI BUG 'NOT DEFINED')
     const MOCK_POCKETS_KEY = "JAGOFAMILY_MOCK_POCKETS_V5";
     const MOCK_TRANSACTIONS_KEY = "JAGOFAMILY_MOCK_TRANSACTIONS_V5";
     const MOCK_USERS_KEY = "JAGOFAMILY_MOCK_USERS_V5";
@@ -557,18 +649,18 @@
       isMockMode = true; document.getElementById('demoBadge').classList.remove('hidden');
     }
 
-    // BRIDGE API UTAMA MENGGANTIKAN google.script.run
+    // JEMBATAN PENGGANTI google.script.run YANG COCOK DENGAN DOPOST API
     async function executeCloudApi(actionName, payloadData = {}) {
       if (isMockMode) return null;
       try {
         const response = await fetch(GAS_WEB_APP_URL, {
           method: "POST", mode: "cors",
           body: JSON.stringify({ action: actionName, payload: payloadData }),
-          headers: { "Content-Type": "text/plain;charset=utf-8" } // JANGAN UBAH INI
+          headers: { "Content-Type": "text/plain;charset=utf-8" }
         });
         return await response.json();
       } catch (err) {
-        showCustomAlert("Kesalahan Jaringan", "Gagal menghubungi server API Cloud: " + err.toString(), "error");
+        showCustomAlert("Kesalahan Jaringan", "Gagal menghubungi server Cloud API: " + err.toString(), "error");
         return { success: false, message: err.toString() };
       }
     }
@@ -583,8 +675,7 @@
       return `${day} ${months[date.getMonth()]} ${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
     }
 
-    function liveFormatCurrency(inputId, outputId) { liveFormatCurrencyRaw(inputId, outputId); }
-    function liveFormatCurrencyRaw(inputId, outputId) {
+    function liveFormatCurrency(inputId, outputId) {
       const val = parseFloat(document.getElementById(inputId).value) || 0;
       document.getElementById(outputId).innerText = formatRupiah(val);
     }
@@ -641,7 +732,7 @@
         localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
         closeEditPocketModal(); loadAllSystemData(); showCustomAlert("Sukses", "Perubahan saku lokal disimpan.", "success");
       } else {
-        let res = await executeCloudApi('updatePocket', { sheetId: session.sheetId, oldName, newName, percentage, color, icon });
+        let res = await executeCloudApi('updatePocketInSheet', { sheetId: session.sheetId, oldName, newName, percentage, color, icon });
         if (res && res.success) { closeEditPocketModal(); loadAllSystemData(); showCustomAlert("Sukses", "Saku tersinkronisasi ke cloud.", "success"); }
       }
     }
@@ -649,7 +740,7 @@
     function openDeletePocketModal(pocketName) {
       if (globalPockets.length <= 1) { showCustomAlert("Batal", "Sistem membutuhkan minimal satu saku aktif!", "error"); return; }
       document.getElementById('deletePocketSource').value = pocketName;
-      document.getElementById('deletePocketHeading').innerText = `Saku "${pocketName}" akan dihapus. Pilih target pelimpahan anggaran kalkulasi saldo:`;
+      document.getElementById('deletePocketHeading').innerText = `Saku "${pocketName}" akan dibongkar. Pilih target pelimpahan anggaran kalkulasi saldo:`;
       let targetDropdown = document.getElementById('deletePocketTarget'); targetDropdown.innerHTML = "";
       globalPockets.forEach(p => {
         if (p.name !== pocketName) {
@@ -676,7 +767,7 @@
         localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
         closeDeletePocketModal(); loadAllSystemData(); showCustomAlert("Sukses", "Saku lokal dilebur.", "success");
       } else {
-        let res = await executeCloudApi('deleteAndReallocatePocket', { sheetId: session.sheetId, pocketToDelete, targetPocket, redistributeMode });
+        let res = await executeCloudApi('deleteAndReallocatePocketInSheet', { sheetId: session.sheetId, pocketToDelete, targetPocket, redistributeMode });
         if (res && res.success) { closeDeletePocketModal(); loadAllSystemData(); showCustomAlert("Sukses", "Peleburan cloud aman.", "success"); }
       }
     }
@@ -693,7 +784,7 @@
       globalPockets.forEach(p => { let opt = document.createElement('option'); opt.value = p.name; opt.innerText = p.name; editTxPocket.appendChild(opt); });
       if (t.type === "Pengeluaran") document.getElementById('editTxPocket').value = t.pocket;
       document.getElementById('editTxAmount').value = t.amount; document.getElementById('editTxNotes').value = t.notes;
-      liveFormatCurrencyRaw('editTxAmount', 'editTxAmountFormatted'); checkEditTxType();
+      liveFormatCurrency('editTxAmount', 'editTxAmountFormatted'); checkEditTxType();
       document.getElementById('editTransactionModal').classList.remove('hidden');
     }
     function closeEditTransactionModal() { document.getElementById('editTransactionModal').classList.add('hidden'); }
@@ -719,7 +810,7 @@
         localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
         closeEditTransactionModal(); loadAllSystemData(); showCustomAlert("Sukses", "Kas lokal direkonsiliasi.", "success");
       } else {
-        let res = await executeCloudApi('updateTransaction', { sheetId: session.sheetId, txIndex, type, pocketName: pocket, amount, notes });
+        let res = await executeCloudApi('updateTransactionInSheet', { sheetId: session.sheetId, txIndex, type, pocketName: pocket, amount, notes });
         if (res && res.success) { closeEditTransactionModal(); loadAllSystemData(); showCustomAlert("Sukses", "Kas cloud sinkron.", "success"); }
       }
     }
@@ -740,6 +831,7 @@
 
     function toggleMobileSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebarOverlay').classList.toggle('hidden'); }
 
+    // Sliding session management
     function saveSession(sheetId, email) {
       localStorage.setItem('S_ID', sheetId); localStorage.setItem('S_EM', email); localStorage.setItem('S_EX', (Date.now() + sessionTimeout).toString());
     }
@@ -874,7 +966,6 @@
       let configList = document.getElementById('pocketConfigList'); configList.innerHTML = "";
       let totalBalance = 0;
 
-      // Update Form Dropdowns
       let txPocket = document.getElementById('txPocket'); txPocket.innerHTML = "";
       let tSrc = document.getElementById('transferSource'); tSrc.innerHTML = "";
       let tTgt = document.getElementById('transferTarget'); tTgt.innerHTML = "";
@@ -885,7 +976,6 @@
         let isInvest = isInvestmentPocket(p.name);
         let barColor = isInvest ? '#10b981' : (p.spent > p.allocated ? '#ef4444' : p.color);
 
-        // Populate Dropdowns
         txPocket.innerHTML += `<option value="${p.name}">${p.name} (Sisa: ${formatRupiah(p.remaining)})</option>`;
         tSrc.innerHTML += `<option value="${p.name}">${p.name} (Sisa: ${formatRupiah(p.remaining)})</option>`;
         tTgt.innerHTML += `<option value="${p.name}">${p.name}</option>`;
@@ -941,8 +1031,7 @@
 
     function renderAnalyticsChart() {
       let canvas = document.getElementById('pocketDonutChart'); if (!canvas) return;
-      let ctx = canvas.getContext('2d');
-      if (donutChartInstance) donutChartInstance.destroy();
+      let ctx = canvas.getContext('2d'); if (donutChartInstance) donutChartInstance.destroy();
       const isLight = document.body.classList.contains('light-theme');
       donutChartInstance = new Chart(ctx, {
         type: 'bar',
@@ -969,12 +1058,12 @@
       selectedFormType = type;
       let btnIn = document.getElementById('btnFormIn'); let btnOut = document.getElementById('btnFormOut');
       if (type === "Pemasukan") {
-        btnIn.className = "py-1.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg uppercase transition";
-        btnOut.className = "py-1.5 text-[10px] font-bold bg-transparent text-slate-500 border border-slate-500/10 hover:border-slate-500/20 rounded-lg uppercase transition";
+        btnIn.className = "py-1.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg uppercase";
+        btnOut.className = "py-1.5 text-[10px] font-bold bg-transparent text-slate-500 border border-slate-500/10 rounded-lg uppercase";
         document.getElementById('formPocketWrapper').classList.add('hidden');
       } else {
-        btnOut.className = "py-1.5 text-[10px] font-bold bg-pink-500/20 text-pink-500 border border-pink-500/30 rounded-lg uppercase transition";
-        btnIn.className = "py-1.5 text-[10px] font-bold bg-transparent text-slate-500 border border-slate-500/10 hover:border-slate-500/20 rounded-lg uppercase transition";
+        btnOut.className = "py-1.5 text-[10px] font-bold bg-pink-500/20 text-pink-500 border border-pink-500/30 rounded-lg uppercase";
+        btnIn.className = "py-1.5 text-[10px] font-bold bg-transparent text-slate-500 border border-slate-500/10 rounded-lg uppercase";
         document.getElementById('formPocketWrapper').classList.remove('hidden');
       }
     }
@@ -1024,20 +1113,13 @@
     }
 
     function switchAuthState(state) {
-      currentAuthState = state;
-      document.getElementById('authMessage').innerText = "";
+      currentAuthState = state; document.getElementById('authMessage').innerText = "";
       document.getElementById('passwordFieldGroup').style.display = (state === 'forgot' || state === 'reset') ? 'none' : 'block';
       document.getElementById('resetFieldsGroup').className = (state === 'reset') ? 'space-y-4' : 'hidden';
       document.getElementById('authButtons').className = (state === 'login') ? 'space-y-3' : 'hidden';
       document.getElementById('registerButtons').className = (state === 'register') ? 'space-y-3' : 'hidden';
       document.getElementById('forgotButtons').className = (state === 'forgot' || state === 'reset') ? 'space-y-3' : 'hidden';
-      document.getElementById('btnExecuteReset').className = (state === 'reset') ? 'w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider' : 'hidden';
-      
-      const authTitle = document.getElementById('authTitle');
-      if(state === 'login') authTitle.innerHTML = '<i class="fa-solid fa-shield-halved text-blue-500"></i> Masuk';
-      if(state === 'register') authTitle.innerHTML = '<i class="fa-solid fa-plus text-emerald-500"></i> Buat Akun Baru';
-      if(state === 'forgot') authTitle.innerHTML = '<i class="fa-solid fa-circle-question text-amber-500"></i> Lupa Sandi';
-      if(state === 'reset') authTitle.innerHTML = '<i class="fa-solid fa-key text-blue-500"></i> Setel Ulang Sandi';
+      document.getElementById('btnExecuteReset').className = (state === 'reset') ? 'w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase' : 'hidden';
     }
 
     async function handleAuthSubmit() {
@@ -1047,8 +1129,7 @@
 
     async function handleLogin() {
       let email = document.getElementById('email').value.trim(); let pass = document.getElementById('password').value.trim();
-      let hashed = await hashPassword(pass);
-      document.getElementById('authMessage').innerText = "Memverifikasi...";
+      let hashed = await hashPassword(pass); document.getElementById('authMessage').innerText = "Memverifikasi...";
       
       if (isMockMode) {
         setTimeout(() => {
@@ -1061,51 +1142,43 @@
         let res = await executeCloudApi('loginUser', { email, password: hashed });
         document.getElementById('authMessage').innerText = "";
         if (res && res.success) { session.sheetId = res.sheetId; session.email = res.email; saveSession(session.sheetId, session.email); setupUIOnLogin(); }
-        else showCustomAlert("Gagal", res ? res.message : "Gagal menghubungi server.", "error");
+        else showCustomAlert("Gagal", res ? res.message : "Gagal terhubung.", "error");
       }
     }
 
     async function handleRegister() {
       let email = document.getElementById('email').value.trim(); let pass = document.getElementById('password').value.trim();
       if(pass.length < 6) { showCustomAlert("Lemah", "Sandi minimal 6 karakter.", "error"); return; }
-      let hashed = await hashPassword(pass);
-      document.getElementById('authMessage').innerText = "Mendaftarkan...";
+      let hashed = await hashPassword(pass); document.getElementById('authMessage').innerText = "Mendaftarkan...";
       
       if (isMockMode) {
         setTimeout(() => {
           let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY)) || [];
-          if(users.find(u => u.email.toLowerCase() === email.toLowerCase())) { document.getElementById('authMessage').innerText = ""; showCustomAlert("Gagal", "Email sudah terdaftar.", "error"); return; }
+          if(users.find(u => u.email.toLowerCase() === email.toLowerCase())) { document.getElementById('authMessage').innerText = ""; showCustomAlert("Gagal", "Email sudah ada.", "error"); return; }
           users.push({ email, password: hashed, sheetId: "MOCK_" + Date.now(), otp: "" });
           localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
-          document.getElementById('authMessage').innerText = ""; showCustomAlert("Sukses", "Akun berhasil dibuat. Silakan login.", "success"); switchAuthState('login');
+          document.getElementById('authMessage').innerText = ""; showCustomAlert("Sukses", "Akun demo siap, silakan login.", "success"); switchAuthState('login');
         }, 800);
       } else {
         let res = await executeCloudApi('registerUser', { email, password: hashed });
         document.getElementById('authMessage').innerText = "";
-        if (res && res.success) { showCustomAlert("Sukses", "Akun & Database cloud dibuat.", "success"); switchAuthState('login'); }
+        if (res && res.success) { showCustomAlert("Sukses", "Akun & Database cloud siap.", "success"); switchAuthState('login'); }
         else showCustomAlert("Gagal", res ? res.message : "Pendaftaran gagal.", "error");
       }
     }
 
     async function sendPasswordResetCode() {
-      let email = document.getElementById('email').value.trim();
-      if(!email) { showCustomAlert("Gagal", "Masukkan email.", "error"); return; }
+      let email = document.getElementById('email').value.trim(); if(!email) return;
       document.getElementById('authMessage').innerText = "Mengirim OTP...";
       
       if (isMockMode) {
-        setTimeout(() => {
-          let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY)) || [];
-          let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-          if (user) {
-            user.otp = "123456"; localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
-            document.getElementById('authMessage').innerText = ""; showCustomAlert("Simulasi", "OTP dikirim (Simulasi lokal: 123456).", "success"); switchAuthState('reset');
-          } else { document.getElementById('authMessage').innerText = ""; showCustomAlert("Gagal", "Email tidak ditemukan.", "error"); }
-        }, 800);
+        let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY)) || [];
+        let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+        if (user) { user.otp = "123456"; localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users)); showCustomAlert("Demo", "OTP Lokal: 123456", "success"); switchAuthState('reset'); }
       } else {
         let res = await executeCloudApi('forgotPassword', { email });
         document.getElementById('authMessage').innerText = "";
         if (res && res.success) { showCustomAlert("Sukses", res.message, "success"); switchAuthState('reset'); }
-        else showCustomAlert("Gagal", res ? res.message : "Pengiriman OTP gagal.", "error");
       }
     }
 
@@ -1113,29 +1186,20 @@
       let email = document.getElementById('email').value.trim();
       let otp = document.getElementById('resetOTP').value.trim();
       let newPass = document.getElementById('newPassword').value.trim();
-      if(!otp || !newPass) { showCustomAlert("Gagal", "Lengkapi OTP dan Sandi Baru.", "error"); return; }
       let hashed = await hashPassword(newPass);
-      document.getElementById('authMessage').innerText = "Verifikasi...";
-      
+
       if (isMockMode) {
-        setTimeout(() => {
-          let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY)) || [];
-          let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-          if (user && user.otp === otp) {
-            user.password = hashed; user.otp = ""; localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
-            document.getElementById('authMessage').innerText = ""; showCustomAlert("Sukses", "Sandi diubah.", "success"); switchAuthState('login');
-          } else { document.getElementById('authMessage').innerText = ""; showCustomAlert("Gagal", "OTP Salah.", "error"); }
-        }, 800);
+        let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY)) || [];
+        let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+        if (user && user.otp === otp) { user.password = hashed; user.otp = ""; localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users)); switchAuthState('login'); }
       } else {
         let res = await executeCloudApi('resetPasswordWithCode', { email, otpCode: otp, newPassword: hashed });
-        document.getElementById('authMessage').innerText = "";
-        if (res && res.success) { showCustomAlert("Sukses", "Sandi diubah. Silakan login.", "success"); switchAuthState('login'); }
-        else showCustomAlert("Gagal", res ? res.message : "Reset sandi gagal.", "error");
+        if (res && res.success) { showCustomAlert("Sukses", "Sandi diubah.", "success"); switchAuthState('login'); }
       }
     }
 
     async function handleDeleteTransaction(txIndex) {
-      showCustomConfirm("Hapus?", "Data kas akan dihapus dari riwayat saku?", async function() {
+      showCustomConfirm("Hapus?", "Hapus transaksi ini?", async function() {
         if (isMockMode) {
           let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)); let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
           let tx = transactions.find(t => t.index === txIndex);
@@ -1143,10 +1207,10 @@
           else pockets.forEach(p => { if (p.name === tx.pocket) p.spent -= tx.amount; p.remaining = p.allocated - p.spent; });
           transactions = transactions.filter(t => t.index !== txIndex);
           localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
-          loadAllSystemData(); showCustomAlert("Sukses", "Transaksi lokal dihapus.", "success");
+          loadAllSystemData();
         } else {
           let res = await executeCloudApi('deleteTransaction', { sheetId: session.sheetId, txIndex });
-          if (res && res.success) { loadAllSystemData(); showCustomAlert("Sukses", "Transaksi dihapus.", "success"); }
+          if (res && res.success) loadAllSystemData();
         }
       });
     }
