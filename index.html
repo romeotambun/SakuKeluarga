@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SakuKeluarga - Hub Keuangan Keluarga</title>
-  <link rel="icon" type="image/svg+xml" href="icon.svg">
-  <link rel="manifest" href="manifest.json">
   
   <!-- Tailwind CSS & FontAwesome Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -16,6 +14,16 @@
   
   <!-- Google Font: Inter & JetBrains Mono -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- INJEKSI PERBAIKAN IKON PWA UNTUK HOME SCREEN MOBILE (IOS & ANDROID) -->
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" sizes="192x192" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAEL0lEQVR4nO3dPW5cVRiA4TFY0BAKK0gUlGlZAJuAyjSI1UU0pIJNsIBsgQIJyQWiQkKhCE7i2OOZeO6P73mfp7FsuTia+V6fq3OvPGdPnj57tYOoj9ZeAKxJAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBrOTqxf3fswwBrOB62Pd9ZTlnPiVyWccM+cXl/OvgNTvAgo79C28nWI4dYAGnDLTdYF4CmMnHP/141O/9+8Pzg4GIYD4ugR6BQwPukmg+AngkLi7vD0EE8xDADOa65hfB9AQwsSmGVATLEcCEphxOESxDABOZYyhFMD8BnOjqxbzDeCgCIZxGACdYavgck85HAA+09NCJYB4CeID7hu3Qef4p3CuY3vnaC3jM9j3O8MU/N7//85Pnu91uuUcWLi73D/vVC49OfAg7wESWHjo7wTQEMIG1/uKK4HQC2DjHpUxHCIAw3+cAArACdHDCWCPbQ2NCB5GAHfY6rA4Jv1wAnjPCMMiiuMJ4B0jDYcIjiOA/404FCI4TAC7sYdBBPdLB1A5J3evYL9sALV/ReKY9G7JAGrDf00Et+UCWOTAU9WOSYcKwPX+dCoRDBOA4Z9eIYIhAjD88xk9gs0HYPjnN3IEmw3AGf+yRr1ZsMkAHHOuY8Rj0s0FYPjXNVoEm/qcYJc8j8sI78emdoB9L+pWXu zRjPB+bCqA3e72i7ulF3tEW38/NnUJ9K59/wf/y+9+W34xIX/88s2dP9/q5xJs bge4tsUXe2RbfT82GwBMQQCkCYA0AZAmANIEQJoASBMUaQIgTQBkCYA0AZAmANIEQJoASBMUaQIgTTt78vTd2kuYlB2ANA GQJgDSBECaAEgTAGkCDEMH9tevd48sP+/275VW8njZAYb1/vDv+1mdAAZ036CL 4CYBHOaYARfBWwIgTQBkCYA0AZAmgMEcc9bvfsBbAhjQfQNu+G8SwKDuGnTD f5tHIQZm4A+zA5AmANIEQJoASBMUaQIgTQw6Bl2fP//175VW8mDfg+K3yg5A mgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQdPXn67NXai4C12AFIEwBpA iBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKQJ GgBkCYA0gRAmgBIEwBpAiBNAKQJgDQBkCYA0gRAmgBIEwBpAiBNAKT9B5xm6zu7+CQcAAAAAElFTkSuQmCC">
+  <link rel="apple-touch-icon" sizes="512x512" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAYAAAD0eNT6AAANAklEQVR4nO3dPY4dxxlAUdIi5ER0INCAA4dMvQBtwo7kTKsTlFiRvAkvwFtwIECAAsOREzoQxiKlmeH76eruqntOKL7htAh0fXfqvep5+frN23cvAICU3xx9AQDA/gQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkAAAgCABAABBAgAAggQAAAQJAAAIEgAAECQAACBIAABAkACAiB+/3fZ1wNwEAAQ8DPWPDfdLXwfMTwDA4n45zJ8a7pe+DliDAICF3TvsRQCs6+XrN2/fHX0RwLYuHdyff3nda4F1CABYzMif2kUArMNbALCQ0Vv23hKAdQgAWMRew1kEwBoEACxg76EsAmB+AgAmd9QwFgEwNwEAEzt6CB/9/YHbCQCY1FmG71muA7iOY4AwmTMPXMcEYR52AGAiZx7+L16c//qAnwkAmMQsw3WW64Q6bwHACX3yzVe7fJ8fPv162N/t7QA4NzsAEDZySNsJgHMTABAnAqBJAAAiAIIEAJzMUQNzdAQIATgXAQAncvSQHP3BvaP//4CfCQA4ibMMRxEADQIATuBsQ1EEwPoEABzsrMPw8y99OBBWJgDgQDMMQREAaxIAcJCZhp8IgPUIADjAjENPBMBaBADsaPbz8J4VAOsQALCTVYabEwKwBgEAO1htqIkAmJ8AgMFWHWaO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">
+  <link rel="manifest" href="manifest.json">
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SakuKeluarga">
 
   <style>
     :root {
@@ -873,9 +881,6 @@
   </div>
 
   <script>
-    // =========================================================================
-    // TEMPELKAN LINK WEB APP URL YANG KAMU DAPATKAN DARI GOOGLE APPS SCRIPT DI SINI:
-    // =========================================================================
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwmb3D13MyZC_0QB7pUXAi4AMOSjXXLjx5Govhh71IPhNr_0sDABZ5AGE9ri_rOrUNb/exec";
 
     let session = { sheetId: "", email: "" };
@@ -890,7 +895,6 @@
     const rowsPerPage = 10;
     let currentConfirmCallback = null;
 
-    // JEMBATAN FETCH API KE BACKEND GOOGLE SCRIPT
     async function callGasBackend(actionName, argumentArray) {
       if (!GAS_WEB_APP_URL || GAS_WEB_APP_URL.includes("AKfycbz...UR_API_URL")) {
         throw new Error("Tautan API Web App URL belum dipasang pada kode HTML!");
@@ -921,7 +925,6 @@
       });
     }
 
-    // RENDERING CORE STATE (PONDASI UTAMA SINKRONISASI TAMPILAN)
     function renderSystemState(res) {
       if (!res || !res.success) {
         showCustomAlert("Sinkronisasi Bermasalah", res ? res.message : "Tidak ada respon dari database cloud", "error");
@@ -1563,12 +1566,14 @@
       document.getElementById('demoBadge').classList.remove('hidden');
     } else {
       isMockMode = false;
-      document.getElementById('demoBadge').add ? document.getElementById('demoBadge').add('hidden') : document.getElementById('demoBadge').classList.add('hidden');
+      document.getElementById('demoBadge').classList.add('hidden');
     }
 
     const MOCK_POCKETS_KEY = "JAGOFAMILY_MOCK_POCKETS_V5";
     const MOCK_TRANSACTIONS_KEY = "JAGOFAMILY_MOCK_TRANSACTIONS_V5";
     const MOCK_USERS_KEY = "JAGOFAMILY_MOCK_USERS_V5";
+
+    fontFamily = 'Inter';
 
     function toggleTheme() {
       const isLight = document.body.classList.toggle('light-theme');
