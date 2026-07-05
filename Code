@@ -1,0 +1,527 @@
+const MASTER_SHEET_ID = "1Ss9juT9-8elb45ht-4q3JrBqibfv3ljq_a9-WDkZdT0";
+
+function doGet() {
+  return HtmlService.createTemplateFromFile('Index')
+      .evaluate()
+      .setTitle('SakuHarmoni Hub')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+// FUNGSI BANTUAN PARSING TANGGAL ULTRA AMAN UNTUK MENCEGAH CRASH NULL RESPONSE
+function safeParseDate(dateObj) {
+  try {
+    if (dateObj instanceof Date) {
+      return dateObj.toISOString();
+    }
+    if (dateObj) {
+      var str = dateObj.toString().trim();
+      var parsedDate = new Date(str);
+      if (!isNaN(parsedDate.getTime())) {
+        return parsedDate.toISOString();
+      }
+      
+      // Mengurai format kustom terlokalisasi Sheets: "6/30/2026 0:17:2" -> M/D/YYYY H:M:S
+      var parts = str.split(/[\/\s:]/);
+      if (parts.length >= 6) {
+        var month = parseInt(parts[0], 10) - 1;
+        var day = parseInt(parts[1], 10);
+        var year = parseInt(parts[2], 10);
+        var hour = parseInt(parts[3], 10);
+        var min = parseInt(parts[4], 10);
+        var sec = parseInt(parts[5], 10);
+        
+        var d = new Date(year, month, day, hour, min, sec);
+        if (!isNaN(d.getTime())) {
+          return d.toISOString();
+        }
+      }
+    }
+  } catch (e) {}
+  return new Date().toISOString(); // Fallback akhir aman jika semua parsing gagal
+}
+
+// 1. REGISTRASI (DENGAN CEK DUPLIKAT EMAIL CASE-INSENSITIVE)
+function registerUser(email, password) {
+  const masterSs = SpreadsheetApp.openById(MASTER_SHEET_ID);
+  const userSheet = masterSs.getSheetByName("Users");
+  const data = userSheet.getDataRange().getValues();
+  
+  // Cek duplikasi email
+  const searchEmail = email.toLowerCase().trim();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0].toString().toLowerCase().trim() === searchEmail) {
+      return { success: false, message: "Email ini sudah terdaftar di sistem!" };
+    }
+  }
+  
+  try {
+    // Membuat file langsung di Root Drive (Bawaan aman Google Apps Script)
+    const newSs = SpreadsheetApp.create("SakuKeluarga - " + email);
+    const userSheetId = newSs.getId();
+    
+    // Setup Kantong Sheet
+    const pocketSheet = newSs.insertSheet("Kantong");
+    pocketSheet.appendRow(["Nama Kantong", "Persentase (%)", "Alokasi Tersedia", "Total Terpakai", "Warna Hex", "Ikon"]);
+    pocketSheet.appendRow(["Kebutuhan Pokok", 50, 0, 0, "#3b82f6", "fa-solid fa-house"]);
+    pocketSheet.appendRow(["Shopping", 20, 0, 0, "#ec4899", "fa-solid fa-cart-shopping"]);
+    pocketSheet.appendRow(["Hobby", 20, 0, 0, "#f59e0b", "fa-solid fa-gamepad"]);
+    pocketSheet.appendRow(["Tabungan", 10, 0, 0, "#10b981", "fa-solid fa-piggy-bank"]);
+    
+    // Setup Transaksi Sheet
+    const txSheet = newSs.insertSheet("Transaksi");
+    txSheet.appendRow(["Tanggal", "Tipe", "Kantong", "Jumlah", "Catatan"]);
+    
+    // Hapus Sheet bawaan
+    const defaultSheet = newSs.getSheetByName("Sheet1");
+    if (defaultSheet) newSs.deleteSheet(defaultSheet);
+    
+    // Simpan ke Master: [Email, Password, SheetId, OTPCode]
+    userSheet.appendRow([email, password, userSheetId, ""]);
+    
+    return { success: true, message: "Registrasi sukses! Silahkan login ke hub Anda." };
+  } catch (e) {
+    return { success: false, message: "Gagal membuat database akun: " + e.toString() };
+  }
+}
+
+// 2. FORGOT PASSWORD (OTP GENERATION & MAIL)
+function forgotPassword(email) {
+  try {
+    const masterSs = SpreadsheetApp.openById(MASTER_SHEET_ID);
+    const userSheet = masterSs.getSheetByName("Users");
+    const data = userSheet.getDataRange().getValues();
+    const searchEmail = email.toLowerCase().trim();
+    
+    let rowIndex = -1;
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0].toString().toLowerCase().trim() === searchEmail) {
+        rowIndex = i + 1;
+        break;
+      }
+    }
+    
+    if (rowIndex === -1) {
+      return { success: false, message: "Email tidak ditemukan dalam sistem!" };
+    }
+    
+    // Generate 6 digit pin
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    userSheet.getRange(rowIndex, 4).setValue(otp); // Catat di kolom ke-4
+    
+    // Kirim email OTP
+    MailApp.sendEmail({
+      to: email,
+      subject: "[SakuHarmoni] Kode Keamanan Verifikasi Setel Ulang Sandi",
+      body: "Halo, kami menerima permintaan setel ulang sandi untuk akun Hub Keuangan SakuHarmoni Anda.\n\n" +
+            "Gunakan Kode Keamanan OTP berikut untuk melanjutkan proses verifikasi:\n\n" +
+            "▶ OTP: " + otp + "\n\n" +
+            "Jika Anda tidak meminta ini, abaikan email ini secara aman."
+    });
+    
+    return { success: true, message: "Kode keamanan OTP berhasil dikirim ke email!" };
+  } catch (e) {
+    return { success: false, message: "Gagal memproses OTP: " + e.toString() };
+  }
+}
+
+// 3. RESET PASSWORD DENGAN OTP VERIFICATION
+function resetPasswordWithCode(email, otpCode, newPassword) {
+  try {
+    const masterSs = SpreadsheetApp.openById(MASTER_SHEET_ID);
+    const userSheet = masterSs.getSheetByName("Users");
+    const data = userSheet.getDataRange().getValues();
+    const searchEmail = email.toLowerCase().trim();
+    
+    let rowIndex = -1;
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0].toString().toLowerCase().trim() === searchEmail) {
+        rowIndex = i + 1;
+        break;
+      }
+    }
+    
+    if (rowIndex === -1) return { success: false, message: "Akun tidak ditemukan!" };
+    
+    const dbOTP = data[rowIndex - 1][3] ? data[rowIndex - 1][3].toString().trim() : "";
+    if (dbOTP === "" || dbOTP !== otpCode.trim()) {
+      return { success: false, message: "Kode OTP Salah atau Kadaluwarsa!" };
+    }
+    
+    // Update Password di kolom ke-2 & reset OTP ke kosong
+    userSheet.getRange(rowIndex, 2).setValue(newPassword);
+    userSheet.getRange(rowIndex, 4).setValue("");
+    
+    return { success: true, message: "Kata sandi sukses diperbarui! Silahkan login." };
+  } catch(e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+// 4. LOGIN USER
+function loginUser(email, password) {
+  const masterSs = SpreadsheetApp.openById(MASTER_SHEET_ID);
+  const userSheet = masterSs.getSheetByName("Users");
+  const data = userSheet.getDataRange().getValues();
+  const searchEmail = email.toLowerCase().trim();
+  
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0].toString().toLowerCase().trim() === searchEmail && data[i][1].toString() === password) {
+      return { success: true, sheetId: data[i][2], email: data[i][0] };
+    }
+  }
+  return { success: false, message: "Email atau Password salah!" };
+}
+
+// 5. AMBIL DATA DASHBOARD USER (KANTONG & TRANSAKSI)
+function getDashboardData(sheetId) {
+  try {
+    const ss = SpreadsheetApp.openById(sheetId);
+    
+    const pocketSheet = ss.getSheetByName("Kantong");
+    const pocketData = pocketSheet.getDataRange().getValues();
+    let pockets = [];
+    for (let i = 1; i < pocketData.length; i++) {
+      pockets.push({
+        name: pocketData[i][0],
+        percentage: parseFloat(pocketData[i][1]),
+        allocated: parseFloat(pocketData[i][2]) || 0,
+        spent: parseFloat(pocketData[i][3]) || 0,
+        remaining: (parseFloat(pocketData[i][2]) || 0) - (parseFloat(pocketData[i][3]) || 0),
+        color: pocketData[i][4] || "#3b82f6",
+        icon: pocketData[i][5] || "fa-solid fa-wallet"
+      });
+    }
+    
+    const txSheet = ss.getSheetByName("Transaksi");
+    const txData = txSheet.getDataRange().getValues();
+    let transactions = [];
+    for (let i = txData.length - 1; i >= 1; i--) {
+      let dateObj = txData[i][0];
+      let dateString = safeParseDate(dateObj); // Memanggil parser tanggal tangguh
+      transactions.push({
+        index: i,
+        date: dateString,
+        type: txData[i][1],
+        pocket: txData[i][2],
+        amount: parseFloat(txData[i][3]),
+        notes: txData[i][4]
+      });
+    }
+    
+    return { success: true, pockets: pockets, transactions: transactions };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+// 6. CATAT TRANSAKSI (SINKRONISASI STABIL & AKURAT)
+function addTransaction(sheetId, type, pocketName, amount, notes, userEmail) {
+  try {
+    const ss = SpreadsheetApp.openById(sheetId);
+    const txSheet = ss.getSheetByName("Transaksi");
+    const pocketSheet = ss.getSheetByName("Kantong");
+    
+    amount = parseFloat(amount) || 0;
+    const date = new Date();
+    
+    let targetPocket = (type === "Pemasukan") ? "Semua" : pocketName;
+    txSheet.appendRow([date, type, targetPocket, amount, notes]);
+    
+    let pocketData = pocketSheet.getDataRange().getValues();
+    let warningTriggered = false;
+    let warningMessage = "";
+    
+    if (type === "Pemasukan") {
+      for (let i = 1; i < pocketData.length; i++) {
+        let pct = parseFloat(pocketData[i][1]) / 100;
+        let allocation = amount * pct;
+        let currentAllocated = parseFloat(pocketData[i][2]) || 0;
+        
+        pocketSheet.getRange(i + 1, 3).setValue(currentAllocated + allocation);
+      }
+    } else if (type === "Pengeluaran") {
+      for (let i = 1; i < pocketData.length; i++) {
+        if (pocketData[i][0] === pocketName) {
+          let currentSpent = parseFloat(pocketData[i][3]) || 0;
+          let totalAllocated = parseFloat(pocketData[i][2]) || 0;
+          let newSpent = currentSpent + amount;
+          
+          pocketSheet.getRange(i + 1, 4).setValue(newSpent);
+          
+          // Cek jika melebihi budget kantong (Dikecualikan untuk tabungan / investasi / saham)
+          let isInvestment = /tabungan|saham|investasi|reksadana|deposito|savings|investment/i.test(pocketName);
+          if (newSpent > totalAllocated && !isInvestment) {
+            warningTriggered = true;
+            warningMessage = "⚠️ Peringatan! Pengeluaran di Saku " + pocketName + " telah melebihi budget alokasi!";
+            
+            try {
+              MailApp.sendEmail({
+                to: userEmail,
+                subject: "[JagoFamily Alert] Saku " + pocketName + " Overbudget!",
+                body: "Halo, pengeluaran saku " + pocketName + " telah melebihi budget.\nTotal Pengeluaran: Rp " + newSpent.toLocaleString()
+              });
+            } catch(mailErr) {}
+          }
+          break;
+        }
+      }
+    }
+    return { success: true, warning: warningTriggered, msg: warningMessage };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+// 7. EDIT / UPDATE TRANSAKSI DENGAN INTEGRAL REVERSAL DAN REALLOCATION
+function updateTransactionInSheet(sheetId, txIndex, type, pocketName, amount, notes) {
+  try {
+    const ss = SpreadsheetApp.openById(sheetId);
+    const txSheet = ss.getSheetByName("Transaksi");
+    const pocketSheet = ss.getSheetByName("Kantong");
+    const txData = txSheet.getDataRange().getValues();
+
+    const rowNum = parseInt(txIndex);
+    const oldType = txData[rowNum - 1][1];
+    const oldPocket = txData[rowNum - 1][2];
+    const oldAmount = parseFloat(txData[rowNum - 1][3]) || 0;
+
+    amount = parseFloat(amount) || 0;
+
+    // A. PEMULIHAN HISTORIS (REVERSAL)
+    let pocketData = pocketSheet.getDataRange().getValues();
+    if (oldType === "Pemasukan") {
+      for (let i = 1; i < pocketData.length; i++) {
+        let pct = parseFloat(pocketData[i][1]) / 100;
+        let allocationToDeduct = oldAmount * pct;
+        let currentAllocated = parseFloat(pocketData[i][2]) || 0;
+        pocketSheet.getRange(i + 1, 3).setValue(Math.max(0, currentAllocated - allocationToDeduct));
+      }
+    } else if (oldType === "Pengeluaran") {
+      for (let i = 1; i < pocketData.length; i++) {
+        if (pocketData[i][0] === oldPocket) {
+          let currentSpent = parseFloat(pocketData[i][3]) || 0;
+          pocketSheet.getRange(i + 1, 4).setValue(Math.max(0, currentSpent - oldAmount));
+          break;
+        }
+      }
+    }
+
+    // Ambil data terbaru saku setelah pemulihan
+    pocketData = pocketSheet.getDataRange().getValues();
+
+    // B. PENERAPAN NILAI BARU (APPLY NEW STATE)
+    let targetPocket = (type === "Pemasukan") ? "Semua" : pocketName;
+
+    if (type === "Pemasukan") {
+      for (let i = 1; i < pocketData.length; i++) {
+        let pct = parseFloat(pocketData[i][1]) / 100;
+        let allocation = amount * pct;
+        let currentAllocated = parseFloat(pocketData[i][2]) || 0;
+        pocketSheet.getRange(i + 1, 3).setValue(currentAllocated + allocation);
+      }
+    } else if (type === "Pengeluaran") {
+      for (let i = 1; i < pocketData.length; i++) {
+        if (pocketData[i][0] === pocketName) {
+          let currentSpent = parseFloat(pocketData[i][3]) || 0;
+          pocketSheet.getRange(i + 1, 4).setValue(currentSpent + amount);
+          break;
+        }
+      }
+    }
+
+    // Tulis update pada baris baris di sheet Transaksi
+    txSheet.getRange(rowNum, 2).setValue(type);
+    txSheet.getRange(rowNum, 3).setValue(targetPocket);
+    txSheet.getRange(rowNum, 4).setValue(amount);
+    txSheet.getRange(rowNum, 5).setValue(notes);
+
+    return { success: true };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+// 8. HAPUS TRANSAKSI & PEMULIHAN SALDO
+function deleteTransaction(sheetId, txIndex) {
+  try {
+    const ss = SpreadsheetApp.openById(sheetId);
+    const txSheet = ss.getSheetByName("Transaksi");
+    const pocketSheet = ss.getSheetByName("Kantong");
+    const txData = txSheet.getDataRange().getValues();
+    
+    const rowNum = txIndex;
+    const txType = txData[rowNum - 1][1];
+    const txPocket = txData[rowNum - 1][2];
+    const txAmount = parseFloat(txData[rowNum - 1][3]) || 0;
+    
+    let pocketData = pocketSheet.getDataRange().getValues();
+    if (txType === "Pemasukan") {
+      for (let i = 1; i < pocketData.length; i++) {
+        let pct = parseFloat(pocketData[i][1]) / 100;
+        let allocationToDeduct = txAmount * pct;
+        let currentAllocated = parseFloat(pocketData[i][2]) || 0;
+        pocketSheet.getRange(i + 1, 3).setValue(Math.max(0, currentAllocated - allocationToDeduct));
+      }
+    } else if (txType === "Pengeluaran") {
+      for (let i = 1; i < pocketData.length; i++) {
+        if (pocketData[i][0] === txPocket) {
+          let currentSpent = parseFloat(pocketData[i][3]) || 0;
+          pocketSheet.getRange(i + 1, 4).setValue(Math.max(0, currentSpent - txAmount));
+          break;
+        }
+      }
+    }
+    
+    txSheet.deleteRow(rowNum);
+    return { success: true };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+// 9. BUAT SAKU KUSTOM
+function addCustomPocket(sheetId, name, percentage, color, icon) {
+  try {
+    const ss = SpreadsheetApp.openById(sheetId);
+    const pocketSheet = ss.getSheetByName("Kantong");
+    pocketSheet.appendRow([name, parseFloat(percentage), 0, 0, color, icon]);
+    return { success: true };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+// 10. EDIT / UPDATE ATRIBUT KANTONG
+function updatePocketInSheet(sheetId, oldName, newName, percentage, color, icon) {
+  try {
+    const ss = SpreadsheetApp.openById(sheetId);
+    const pocketSheet = ss.getSheetByName("Kantong");
+    const pocketData = pocketSheet.getDataRange().getValues();
+    
+    for (let i = 1; i < pocketData.length; i++) {
+      if (pocketData[i][0] === oldName) {
+        pocketSheet.getRange(i + 1, 1).setValue(newName);
+        pocketSheet.getRange(i + 1, 2).setValue(parseFloat(percentage));
+        pocketSheet.getRange(i + 1, 5).setValue(color);
+        pocketSheet.getRange(i + 1, 6).setValue(icon);
+        break;
+      }
+    }
+    
+    if (oldName !== newName) {
+      const txSheet = ss.getSheetByName("Transaksi");
+      const txData = txSheet.getValues();
+      for (let j = 1; j < txData.length; j++) {
+        if (txData[j][2] === oldName) {
+          txSheet.getRange(j + 1, 3).setValue(newName);
+        }
+      }
+    }
+    return { success: true };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+// 11. HAPUS & REALOKASI KANTONG
+function deleteAndReallocatePocketInSheet(sheetId, pocketToDelete, targetPocket, redistributeMode) {
+  try {
+    const ss = SpreadsheetApp.openById(sheetId);
+    const pocketSheet = ss.getSheetByName("Kantong");
+    const pocketData = pocketSheet.getDataRange().getValues();
+    
+    let deleteAlloc = 0;
+    let deleteSpent = 0;
+    let deletePercentage = 0;
+    let deleteIndex = -1;
+    
+    for (let i = 1; i < pocketData.length; i++) {
+      if (pocketData[i][0] === pocketToDelete) {
+        let deleteAlloc = parseFloat(pocketData[i][2]) || 0;
+        let deleteSpent = parseFloat(pocketData[i][3]) || 0;
+        let deletePercentage = parseFloat(pocketData[i][1]) || 0;
+        deleteIndex = i + 1;
+        break;
+      }
+    }
+    
+    if (deleteIndex === -1) return { success: false, message: "Saku sumber tidak ditemukan." };
+    
+    for (let i = 1; i < pocketData.length; i++) {
+      if (pocketData[i][0] === targetPocket) {
+        let currentAlloc = parseFloat(pocketData[i][2]) || 0;
+        let currentSpent = parseFloat(pocketData[i][3]) || 0;
+        
+        pocketSheet.getRange(i + 1, 3).setValue(currentAlloc + deleteAlloc);
+        pocketSheet.getRange(i + 1, 4).setValue(currentSpent + deleteSpent);
+        
+        if (redistributeMode === "target") {
+          let currentPct = parseFloat(pocketData[i][1]) || 0;
+          pocketSheet.getRange(i + 1, 2).setValue(currentPct + deletePercentage);
+        }
+        break;
+      }
+    }
+    
+    if (redistributeMode === "split") {
+      let remainingCount = pocketData.length - 2;
+      if (remainingCount > 0) {
+        let share = deletePercentage / remainingCount;
+        for (let i = 1; i < pocketData.length; i++) {
+          if (pocketData[i][0] !== pocketToDelete) {
+            let currentPct = parseFloat(pocketData[i][1]) || 0;
+            pocketSheet.getRange(i + 1, 2).setValue(currentPct + share);
+          }
+        }
+      }
+    }
+    
+    const txSheet = ss.getSheetByName("Transaksi");
+    const txData = txSheet.getDataRange().getValues();
+    for (let j = 1; j < txData.length; j++) {
+      if (txData[j][2] === pocketToDelete) {
+        txSheet.getRange(j + 1, 3).setValue(targetPocket);
+      }
+    }
+    
+    pocketSheet.deleteRow(deleteIndex);
+    return { success: true };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+// 12. PINDAH SALDO ANTAR SAKU (TRANSFER INTERNAL)
+function transferPocketFunds(sheetId, source, target, amount) {
+  try {
+    const ss = SpreadsheetApp.openById(sheetId);
+    const pocketSheet = ss.getSheetByName("Kantong");
+    let pocketData = pocketSheet.getDataRange().getValues();
+    
+    amount = parseFloat(amount) || 0;
+    let srcFound = false;
+    let tgtFound = false;
+    
+    for (let i = 1; i < pocketData.length; i++) {
+      if (pocketData[i][0] === source) {
+        let currentAllocated = parseFloat(pocketData[i][2]) || 0;
+        pocketSheet.getRange(i + 1, 3).setValue(currentAllocated - amount);
+        srcFound = true;
+      }
+      if (pocketData[i][0] === target) {
+        let currentAllocated = parseFloat(pocketData[i][2]) || 0;
+        pocketSheet.getRange(i + 1, 3).setValue(currentAllocated + amount);
+        tgtFound = true;
+      }
+    }
+    if (srcFound && tgtFound) return { success: true };
+    return { success: false, message: "Kantong tidak ditemukan." };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+function triggerAuthorization() {
+const folders = DriveApp.getFoldersByName("SakuHarmoni-Test-Trigger");
+Logger.log("Izin Drive Berhasil Diotorisasi!");
+}
