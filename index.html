@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SakuKeluarga - Hub Keuangan Keluarga</title>
+  
+  <!-- Tailwind CSS & FontAwesome Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js for premium analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Google Font: Inter & JetBrains Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-main: #060913;
+      --bg-sidebar: #090d1a;
+      --bg-panel: #0d1424;
+      --border-panel: rgba(59, 130, 246, 0.2);
+      --border-panel-hover: rgba(59, 130, 246, 0.45);
+      --bg-input: #050811;
+      --border-input: rgba(59, 130, 246, 0.25);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --shadow-panel: 0 10px 30px rgba(0, 0, 0, 0.5);
+      --header-bg: #090d1a;
+      --border-color: rgba(59, 130, 246, 0.15);
+      --card-inner-bg: #10182c;
+      --modal-bg: #0b1120;
+    }
+
+    .light-theme {
+      --bg-main: #f1f5f9;
+      --bg-sidebar: #ffffff;
+      --bg-panel: #ffffff;
+      --border-panel: #cbd5e1;
+      --border-panel-hover: #1e293b;
+      --bg-input: #ffffff;
+      --border-input: #64748b;
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --shadow-panel: 0 10px 25px rgba(15, 23, 42, 0.08);
+      --header-bg: #ffffff;
+      --border-color: #cbd5e1;
+      --card-inner-bg: #f8fafc;
+      --modal-bg: #ffffff;
+    }
+
+    .light-theme .text-slate-500, .light-theme .text-slate-400 { color: #334155 !important; }
+    .light-theme .text-slate-300, .light-theme .text-slate-200 { color: #0f172a !important; }
+    .light-theme select.premium-input, .light-theme input.premium-input { color: #0f172a !important; border-color: #64748b !important; }
+    .light-theme th { background-color: #e2e8f0 !important; color: #0f172a !important; }
+    .light-theme td { color: #1e293b !important; }
+    .light-theme .border, .light-theme .border-r { border-color: #cbd5e1 !important; }
+    .light-theme .nav-btn:hover { background: rgba(59, 130, 246, 0.05) !important; color: #2563eb !important; }
+    .light-theme .nav-btn.active { background: rgba(59, 130, 246, 0.1) !important; color: #2563eb !important; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    .font-monospace { font-family: 'JetBrains Mono', monospace; }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-sidebar); }
+    ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 9999px; }
+
+    .premium-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-panel);
+      box-shadow: var(--shadow-panel);
+      transition: all 0.3s ease;
+    }
+    .premium-panel:hover { border-color: var(--border-panel-hover); }
+
+    .nav-btn { position: relative; transition: all 0.2s ease-in-out; color: var(--text-secondary); }
+    .nav-btn::before {
+      content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%) scaleY(0);
+      width: 4px; height: 24px; background-color: #3b82f6; border-radius: 0 4px 4px 0; transition: all 0.2s ease-in-out;
+    }
+    .nav-btn.active { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+    .nav-btn.active::before { transform: translateY(-50%) scaleY(1); }
+
+    .premium-input { background-color: var(--bg-input); border: 1px solid var(--border-input); color: var(--text-primary); transition: all 0.2s ease-in-out; }
+    .premium-input:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); }
+
+    aside { background-color: var(--bg-sidebar) !important; border-color: var(--border-color) !important; transition: background-color 0.3s ease, border-color 0.3s ease; }
+    header { background-color: var(--header-bg) !important; border-color: var(--border-color) !important; transition: background-color 0.3s ease, border-color 0.3s ease; }
+    main { background-color: var(--bg-main) !important; }
+    .card-profile { background-color: var(--card-inner-bg) !important; border-color: var(--border-color) !important; }
+    .custom-modal-box { background-color: var(--modal-bg); border: 1px solid var(--border-panel-hover); }
+
+    .text-primary-theme { color: var(--text-primary) !important; }
+    .text-secondary-theme { color: var(--text-secondary) !important; }
+    .btn-gradient-blue { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
+    .btn-gradient-blue:hover { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+    .btn-gradient-emerald { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }
+    .btn-gradient-emerald:hover { background: linear-gradient(135deg, #34d399 0%, #059669 100%); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+  </style>
+</head>
+<body class="h-full overflow-hidden">
+
+  <!-- ALERT MODAL -->
+  <div id="customAlertModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="custom-modal-box max-w-sm w-full p-6 rounded-2xl shadow-2xl scale-95 border text-center">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl" id="customAlertIconBg">
+        <i id="customAlertIcon" class="fa-solid"></i>
+      </div>
+      <h3 id="customAlertTitle" class="text-lg font-bold tracking-tight mb-2 text-primary-theme">Pemberitahuan</h3>
+      <p id="customAlertMessage" class="text-xs text-secondary-theme mb-6 leading-relaxed font-semibold"></p>
+      <div class="border-t border-slate-800/40 my-4"></div>
+      <button onclick="closeCustomAlert()" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider">Ok, Mengerti</button>
+    </div>
+  </div>
+
+  <!-- CONFIRMATION MODAL -->
+  <div id="customConfirmModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="custom-modal-box max-w-sm w-full p-6 rounded-2xl shadow-2xl scale-95 border">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl bg-amber-500/10 text-amber-500 border border-amber-500/20">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h3 id="customConfirmTitle" class="text-lg font-bold tracking-tight text-center mb-2 text-primary-theme">Butuh Konfirmasi</h3>
+      <p id="customConfirmMessage" class="text-xs text-secondary-theme text-center mb-6 leading-relaxed font-semibold"></p>
+      <div class="grid grid-cols-2 gap-3">
+        <button onclick="closeCustomConfirm(false)" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl font-bold text-xs uppercase border border-slate-700">Batal</button>
+        <button onclick="closeCustomConfirm(true)" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase">Konfirmasi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT POCKET MODAL -->
+  <div id="editPocketModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="custom-modal-box max-w-md w-full p-6 rounded-2xl shadow-2xl border">
+      <h3 class="text-base font-bold tracking-tight mb-4 border-b pb-2 text-primary-theme"><i class="fa-solid fa-edit text-blue-500 mr-2"></i>Edit Kantong Keuangan</h3>
+      <input type="hidden" id="editPocketOldName">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-secondary-theme">Nama Saku</label>
+          <input type="text" id="editPocketName" class="w-full py-2.5 px-3 premium-input text-xs font-bold rounded-xl">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-secondary-theme">Porsi Alokasi (%)</label>
+          <input type="number" id="editPocketPercentage" min="1" max="100" class="w-full py-2.5 px-3 premium-input text-xs font-bold rounded-xl font-monospace">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-secondary-theme">Ikon Visual</label>
+            <select id="editPocketIcon" class="w-full premium-input py-2.5 px-3 text-xs font-bold rounded-xl">
+              <option value="fa-solid fa-house">🏠 Rumah Tangga</option>
+              <option value="fa-solid fa-cart-shopping">🛒 Belanja</option>
+              <option value="fa-solid fa-gamepad">🎮 Hiburan</option>
+              <option value="fa-solid fa-piggy-bank">🐷 Tabungan</option>
+              <option value="fa-solid fa-car">🚗 Kendaraan</option>
+              <option value="fa-solid fa-graduation-cap">🎓 Pendidikan</option>
+              <option value="fa-solid fa-heart-pulse">❤️ Kesehatan</option>
+              <option value="fa-solid fa-gift">🎁 Kado / Sosial</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-secondary-theme">Warna Saku</label>
+            <select id="editPocketColor" class="w-full premium-input py-2.5 px-3 text-xs font-bold rounded-xl">
+              <option value="#3b82f6">Ocean Blue</option>
+              <option value="#10b981">Emerald Green</option>
+              <option value="#ec4899">Pink Rose</option>
+              <option value="#f59e0b">Amber Glow</option>
+              <option value="#8b5cf6">Purple Magic</option>
+              <option value="#ef4444">Ruby Crimson</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mt-6">
+        <button onclick="closeEditPocketModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl font-bold text-xs uppercase border border-slate-700">Batal</button>
+        <button onclick="saveEditPocket()" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase">Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE POCKET MODAL -->
+  <div id="deletePocketModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="custom-modal-box max-w-md w-full p-6 rounded-2xl shadow-2xl border">
+      <div class="w-12 h-12 rounded-full bg-red-500/10 text-red-500 border border-red-500/20 flex items-center justify-center text-xl mx-auto mb-3">
+        <i class="fa-solid fa-trash-can"></i>
+      </div>
+      <h3 class="text-base font-bold tracking-tight text-center mb-1 text-primary-theme">Hapus & Realokasi Saku</h3>
+      <p id="deletePocketHeading" class="text-[11px] text-secondary-theme text-center mb-6 leading-relaxed font-semibold"></p>
+      <input type="hidden" id="deletePocketSource">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-secondary-theme">Langkah 1: Alihkan Seluruh Saldo & Pengeluaran ke:</label>
+          <select id="deletePocketTarget" class="w-full premium-input py-2.5 px-3 text-xs font-bold rounded-xl"></select>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-secondary-theme">Langkah 2: Skema Redistribusi Persentase Alokasi (%):</label>
+          <select id="deletePocketRedistribute" class="w-full premium-input py-2.5 px-3 text-xs font-bold rounded-xl">
+            <option value="target">Gabungkan Persentase ke Kantong Penerima</option>
+            <option value="split">Bagi Rata Sisa Persentase ke Seluruh Kantong Aktif</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mt-6">
+        <button onclick="closeDeletePocketModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl font-bold text-xs uppercase border border-slate-700">Batal</button>
+        <button onclick="executeDeleteAndReallocate()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase">Proses Hapus & Gabung</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT TRANSACTION MODAL -->
+  <div id="editTransactionModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="custom-modal-box max-w-md w-full p-6 rounded-2xl shadow-2xl border">
+      <h3 class="text-base font-bold tracking-tight mb-4 border-b pb-2 text-primary-theme"><i class="fa-solid fa-pen-to-square text-blue-500 mr-2"></i>Edit Transaksi Historis</h3>
+      <input type="hidden" id="editTxIndex">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-secondary-theme">Jenis Aliran Dana</label>
+          <select id="editTxType" onchange="checkEditTxType()" class="w-full premium-input py-2.5 px-3 text-xs font-bold rounded-xl">
+            <option value="Pemasukan">Pemasukan (+)</option>
+            <option value="Pengeluaran">Pengeluaran (-)</option>
+          </select>
+        </div>
+        <div id="editTxPocketWrapper">
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-secondary-theme">Saku Alokasi Pemotongan</label>
+          <select id="editTxPocket" class="w-full premium-input py-2.5 px-3 text-xs font-bold rounded-xl"></select>
+        </div>
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-secondary-theme">Jumlah Nominal Transaksi</label>
+            <span id="editTxAmountFormatted" class="text-[9px] font-bold font-monospace text-blue-400">Rp 0</span>
+          </div>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-blue-400 text-xs font-bold font-monospace">Rp</span>
+            <input type="number" id="editTxAmount" oninput="liveFormatCurrency('editTxAmount', 'editTxAmountFormatted')" class="w-full pl-8 pr-3 py-2.5 premium-input text-xs font-bold rounded-xl font-monospace" placeholder="0">
+          </div>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-secondary-theme">Detil / Catatan</label>
+          <input type="text" id="editTxNotes" class="w-full py-2.5 px-3 premium-input text-xs font-semibold rounded-xl" placeholder="Ketik deskripsi...">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mt-6">
+        <button onclick="closeEditTransactionModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl font-bold text-xs uppercase border border-slate-700">Batal</button>
+        <button onclick="saveEditTransaction()" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase">Simpan Perubahan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH CONTAINER -->
+  <div id="authContainer" class="min-h-screen flex items-center justify-center px-4 relative bg-[#04060b]">
+    <div class="absolute w-96 h-96 bg-blue-600 rounded-full blur-[120px] opacity-20 top-1/4 left-1/4 animate-pulse"></div>
+    <div class="absolute w-96 h-96 bg-indigo-600 rounded-full blur-[120px] opacity-20 bottom-1/4 right-1/4 animate-pulse" style="animation-delay: 2s;"></div>
+    
+    <div class="premium-panel max-w-md w-full p-8 rounded-2xl relative z-10 border border-slate-800 bg-[#0d1424]">
+      <form id="authForm" onsubmit="event.preventDefault(); handleAuthSubmit();">
+        <div class="flex flex-col items-center mb-6">
+          <div class="w-14 h-14 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20 mb-3">
+            <i class="fa-solid fa-wallet text-2xl text-white"></i>
+          </div>
+          <h2 class="text-2xl font-extrabold tracking-tight text-white">SakuKeluarga</h2>
+          <p class="text-blue-400 text-[10px] font-bold mt-1 uppercase tracking-widest">[ Hub Keuangan Modern ]</p>
+        </div>
+
+        <h3 id="authTitle" class="text-xs font-bold mb-4 text-slate-300 border-b border-slate-800 pb-2 flex items-center gap-2 uppercase tracking-wider">
+          <i class="fa-solid fa-shield-halved text-blue-500"></i> Masuk Saku Keluarga
+        </h3>
+        
+        <div class="space-y-4 mb-6">
+          <div>
+            <label class="block text-slate-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider">Email</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500"><i class="fa-solid fa-envelope"></i></span>
+              <input type="email" id="email" class="w-full pl-10 pr-4 py-2.5 rounded-xl premium-input font-monospace text-xs" placeholder="saya@gmail.com" required>
+            </div>
+          </div>
+
+          <div id="passwordFieldGroup">
+            <label class="block text-slate-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider">Kata Sandi</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500"><i class="fa-solid fa-lock"></i></span>
+              <input type="password" id="password" class="w-full pl-10 pr-10 py-2.5 rounded-xl premium-input font-monospace text-xs" placeholder="••••••••">
+              <button type="button" onclick="togglePasswordVisibility('password', 'passwordToggleIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300">
+                <i id="passwordToggleIcon" class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="resetFieldsGroup" class="hidden space-y-4">
+            <div class="border-t border-slate-800/60 pt-3">
+              <label class="block text-amber-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider">Kode OTP 6-Digit (Cek Email)</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-500"><i class="fa-solid fa-key"></i></span>
+                <input type="text" id="resetOTP" class="w-full pl-10 pr-4 py-2.5 rounded-xl premium-input font-monospace text-xs tracking-widest text-center text-amber-400 font-bold" placeholder="000000" maxlength="6">
+              </div>
+            </div>
+            <div>
+              <label class="block text-slate-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider">Kata Sandi Baru</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500"><i class="fa-solid fa-lock"></i></span>
+                <input type="password" id="newPassword" class="w-full pl-10 pr-10 py-2.5 rounded-xl premium-input font-monospace text-xs" placeholder="••••••••">
+                <button type="button" onclick="togglePasswordVisibility('newPassword', 'newPasswordToggleIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300">
+                  <i id="newPasswordToggleIcon" class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="authButtons" class="space-y-3">
+          <button type="submit" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider">
+            <i class="fa-solid fa-right-to-bracket mr-1.5"></i> Masuk Sekarang
+          </button>
+          <div class="flex justify-between items-center text-[10px] px-1 font-semibold text-slate-400">
+            <a href="#" onclick="switchAuthState('forgot')" class="text-amber-500 hover:underline">Lupa Password?</a>
+            <span>Belum punya account? <a href="#" onclick="switchAuthState('register')" class="text-blue-400 font-bold hover:underline">Daftar</a></span>
+          </div>
+        </div>
+        
+        <div id="registerButtons" class="space-y-3 hidden">
+          <button type="submit" class="w-full btn-gradient-emerald text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider">
+            <i class="fa-solid fa-plus mr-1.5"></i> Buat Account
+          </button>
+          <p class="text-[10px] text-center font-semibold text-slate-400">Sudah bergabung? <a href="#" onclick="switchAuthState('login')" class="text-blue-400 font-bold hover:underline">Login SakuKeluarga</a></p>
+        </div>
+
+        <div id="forgotButtons" class="space-y-3 hidden">
+          <button type="button" onclick="sendPasswordResetCode()" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition">
+            <i class="fa-solid fa-paper-plane mr-1.5"></i> Kirim Kode OTP Ke Email
+          </button>
+          <button type="button" onclick="executeResetPassword()" id="btnExecuteReset" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hidden">
+            <i class="fa-solid fa-check mr-1.5"></i> Setel Ulang Kata Sandi
+          </button>
+          <p class="text-[10px] text-center font-semibold text-slate-400"><a href="#" onclick="switchAuthState('login')" class="text-slate-300 hover:underline">Kembali ke Login</a></p>
+        </div>
+      </form>
+
+      <p id="authMessage" class="text-center text-[10px] mt-4 font-bold text-red-400 min-h-[16px] uppercase tracking-wider"></p>
+    </div>
+  </div>
+
+  <!-- DASHBOARD CONTAINER -->
+  <div id="dashboardContainer" class="hidden h-screen w-screen flex overflow-hidden relative">
+    <div id="sidebarOverlay" class="hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden" onclick="toggleMobileSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 border-r flex flex-col justify-between bg-[#090d1a] transition-transform duration-300 -translate-x-full lg:translate-x-0 lg:static h-full">
+      <div>
+        <div class="p-5 border-b flex items-center justify-between border-slate-800">
+          <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center rounded-xl shadow shadow-blue-500/20">
+              <i class="fa-solid fa-wallet text-white text-base"></i>
+            </div>
+            <div>
+              <h1 class="text-sm font-extrabold tracking-tight leading-none text-primary-theme">SakuKeluarga</h1>
+              <span class="text-[8px] text-blue-400 font-semibold uppercase tracking-widest">Pocket Hub v1.0</span>
+            </div>
+          </div>
+          <button onclick="toggleMobileSidebar()" class="lg:hidden text-secondary-theme hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+        </div>
+
+        <div class="p-3 mx-3 my-4 border card-profile rounded-xl flex items-center space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center font-bold text-white text-xs" id="userInitial">U</div>
+          <div class="overflow-hidden">
+            <p class="text-[8px] text-slate-500 uppercase font-bold tracking-widest">Akun Aktif:</p>
+            <p id="userDisplay" class="font-bold text-xs truncate text-primary-theme"></p>
+          </div>
+        </div>
+
+        <nav class="px-2 space-y-1">
+          <button onclick="switchTab('tab-dashboard')" id="btn-tab-dashboard" class="nav-btn active w-full text-left py-2 px-3 rounded-xl flex items-center space-x-3 hover:bg-slate-850">
+            <i class="fa-solid fa-chart-pie w-5 text-center text-blue-400 text-xs"></i> <span class="font-semibold text-[10px] uppercase tracking-wider">Ikhtisar Saku</span>
+          </button>
+          <button onclick="switchTab('tab-transactions')" id="btn-tab-transactions" class="nav-btn w-full text-left py-2 px-3 rounded-xl flex items-center space-x-3 hover:bg-slate-850">
+            <i class="fa-solid fa-list-check w-5 text-center text-pink-500 text-xs"></i> <span class="font-semibold text-[10px] uppercase tracking-wider">Buku Riwayat</span>
+          </button>
+          <button onclick="switchTab('tab-pockets')" id="btn-tab-pockets" class="nav-btn w-full text-left py-2 px-3 rounded-xl flex items-center space-x-3 hover:bg-slate-850">
+            <i class="fa-solid fa-folder-plus w-5 text-center text-emerald-400 text-xs"></i> <span class="font-semibold text-[10px] uppercase tracking-wider">Kelola Kantong</span>
+          </button>
+          <button onclick="switchTab('tab-transfer')" id="btn-tab-transfer" class="nav-btn w-full text-left py-2 px-3 rounded-xl flex items-center space-x-3 hover:bg-slate-850">
+            <i class="fa-solid fa-right-left w-5 text-center text-amber-400 text-xs"></i> <span class="font-semibold text-[10px] uppercase tracking-wider">Kirim Saldo</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="p-3 border-t border-slate-800/40">
+        <button onclick="logout()" class="w-full bg-red-950/20 hover:bg-red-950/40 border border-red-900/40 text-red-400 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider">
+          <i class="fa-solid fa-power-off mr-1.5"></i> Keluar
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN VIEW -->
+    <main class="flex-grow flex flex-col min-w-0 h-full overflow-hidden">
+      <header class="h-14 border-b flex items-center justify-between px-4 sm:px-6 flex-shrink-0 relative z-10">
+        <div class="flex items-center space-x-3">
+          <button onclick="toggleMobileSidebar()" class="lg:hidden p-1.5 text-slate-400 hover:text-white bg-slate-800/20 border border-slate-700/10 rounded-lg">
+            <i class="fa-solid fa-bars text-sm"></i>
+          </button>
+          <h2 id="pageTitle" class="text-[10px] font-bold uppercase tracking-widest border-l-2 border-blue-500 pl-3">IKHTISAR SAKU</h2>
+          <span id="demoBadge" class="hidden px-2 py-0.5 bg-amber-500/10 text-amber-400 text-[8px] font-bold border border-amber-500/20 rounded uppercase">MODE DEMO LOKAL</span>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <button onclick="toggleTheme()" id="themeToggleBtn" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition text-[10px] font-bold uppercase">
+            <i class="fa-solid fa-moon text-amber-400"></i> <span id="themeToggleText">MODE GELAP</span>
+          </button>
+          <div class="text-[10px] flex items-center space-x-1.5 font-semibold uppercase">
+            <i class="fa-solid fa-calendar-day text-blue-400"></i> <span id="currentDate">-</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="flex-1 overflow-y-auto p-4 sm:p-5 relative">
+        <div id="alertBox" class="hidden bg-red-950/60 border border-red-500/40 text-red-200 p-3.5 rounded-xl mb-4 flex items-center justify-between shadow-lg">
+          <div class="flex items-center space-x-2.5">
+            <div class="w-7 h-7 rounded-lg bg-red-500 text-black font-extrabold flex items-center justify-center text-xs">⚠️</div>
+            <p id="alertMsg" class="text-[10px] font-medium uppercase tracking-wide leading-relaxed"></p>
+          </div>
+          <button onclick="document.getElementById('alertBox').classList.add('hidden')" class="text-red-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- TAB: DASHBOARD -->
+        <section id="tab-dashboard" class="tab-content space-y-5">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div class="premium-panel p-3.5 rounded-xl flex items-center justify-between">
+              <div>
+                <p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Total Saldo</p>
+                <p class="text-xs sm:text-base font-extrabold mt-0.5 font-monospace truncate" id="metricTotalBalance">Rp 0</p>
+              </div>
+              <div class="w-7 h-7 rounded-lg bg-blue-950/20 text-blue-400 border flex items-center justify-center text-xs"><i class="fa-solid fa-building-columns"></i></div>
+            </div>
+            <div class="premium-panel p-3.5 rounded-xl flex items-center justify-between">
+              <div>
+                <p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Pemasukan</p>
+                <p class="text-xs sm:text-base font-extrabold text-emerald-400 mt-0.5 font-monospace truncate" id="metricTotalIncome">Rp 0</p>
+              </div>
+              <div class="w-7 h-7 rounded-lg bg-emerald-950/20 text-emerald-400 border flex items-center justify-center text-xs"><i class="fa-solid fa-circle-arrow-up"></i></div>
+            </div>
+            <div class="premium-panel p-3.5 rounded-xl flex items-center justify-between">
+              <div>
+                <p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Pengeluaran</p>
+                <p class="text-xs sm:text-base font-extrabold text-pink-500 mt-0.5 font-monospace truncate" id="metricTotalExpense">Rp 0</p>
+              </div>
+              <div class="w-7 h-7 rounded-lg bg-pink-950/20 text-pink-500 border flex items-center justify-center text-xs"><i class="fa-solid fa-circle-arrow-down"></i></div>
+            </div>
+            <div class="premium-panel p-3.5 rounded-xl flex items-center justify-between">
+              <div>
+                <p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Konfigurasi</p>
+                <p class="text-xs sm:text-base font-extrabold text-amber-400 mt-0.5 font-monospace truncate" id="metricTotalPercent">0% / 100%</p>
+              </div>
+              <div class="w-7 h-7 rounded-lg bg-amber-950/20 text-amber-400 border flex items-center justify-center text-xs"><i class="fa-solid fa-percentage"></i></div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+            <!-- Form Input -->
+            <div class="premium-panel p-4 sm:p-5 rounded-xl flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between border-b pb-2 mb-3">
+                  <h3 class="text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-pen-to-square mr-1.5 text-blue-500"></i>Catat Transaksi</h3>
+                </div>
+                <div class="space-y-3">
+                  <div>
+                    <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Jenis Aliran</label>
+                    <div class="grid grid-cols-2 gap-2">
+                      <button onclick="setFormType('Pemasukan')" id="btnFormIn" class="py-1.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg uppercase"><i class="fa-solid fa-plus mr-1"></i> Pemasukan</button>
+                      <button onclick="setFormType('Pengeluaran')" id="btnFormOut" class="py-1.5 text-[10px] font-bold bg-transparent border rounded-lg uppercase"><i class="fa-solid fa-minus mr-1"></i> Pengeluaran</button>
+                    </div>
+                  </div>
+                  <div id="formPocketWrapper" class="hidden">
+                    <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Pilih Saku Pengeluaran</label>
+                    <select id="txPocket" class="w-full premium-input py-1.5 px-2 text-[10px] font-bold rounded-lg"></select>
+                  </div>
+                  <div>
+                    <div class="flex justify-between items-center mb-1">
+                      <label class="block text-[8px] font-bold uppercase tracking-wider">Jumlah Nominal</label>
+                      <span id="txAmountFormatted" class="text-[9px] font-bold font-monospace text-blue-400">Rp 0</span>
+                    </div>
+                    <div class="relative">
+                      <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-blue-400 text-[10px] font-bold font-monospace">Rp</span>
+                      <input type="number" id="txAmount" oninput="liveFormatCurrency('txAmount', 'txAmountFormatted')" class="w-full pl-8 pr-2.5 py-1.5 premium-input text-[10px] font-bold rounded-lg font-monospace" placeholder="0">
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Detil / Catatan</label>
+                    <input type="text" id="txNotes" class="w-full py-1.5 px-2.5 premium-input text-[10px] font-semibold rounded-lg" placeholder="misal: Gaji bulanan">
+                  </div>
+                </div>
+              </div>
+              <div class="mt-4">
+                <button onclick="submitTransaction()" id="btnSubmit" class="w-full btn-gradient-blue text-white py-2.5 font-bold uppercase tracking-widest text-[10px] rounded-lg">Rekam Transaksi</button>
+              </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="premium-panel p-4 sm:p-5 rounded-xl xl:col-span-2 flex flex-col justify-between">
+              <div class="flex items-center justify-between border-b pb-2 mb-3">
+                <h3 class="text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-chart-line mr-1.5 text-pink-500"></i>Analisis Komparasi Budget vs Realisasi</h3>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                <div class="relative h-44 sm:h-48 flex items-center justify-center">
+                  <canvas id="pocketDonutChart"></canvas>
+                </div>
+                <div class="space-y-3">
+                  <div class="bg-black/20 p-3 border rounded-xl space-y-2">
+                    <div class="flex justify-between text-[10px]">
+                      <span class="font-semibold uppercase text-slate-400">Total Budget:</span>
+                      <span class="font-bold font-monospace text-blue-400" id="statTotalBudget">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between text-[10px]">
+                      <span class="font-semibold uppercase text-slate-400">Total Actual:</span>
+                      <span class="font-bold font-monospace text-pink-500" id="statTotalActual">Rp 0</span>
+                    </div>
+                    <div class="border-t border-slate-700/50 my-1"></div>
+                    <div class="flex justify-between text-[10px]">
+                      <span class="font-semibold uppercase text-slate-400">Penyerapan:</span>
+                      <span class="font-bold font-monospace" id="statUtilRate">0%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between border-b pb-2 mb-4">
+              <h3 class="text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-wallet mr-1.5 text-emerald-400"></i>Daftar Saku Keluarga</h3>
+            </div>
+            <div id="pocketList" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5"></div>
+          </div>
+        </section>
+
+        <!-- TAB: TRANSACTIONS -->
+        <section id="tab-transactions" class="tab-content hidden space-y-5">
+          <div class="premium-panel p-4 sm:p-5 rounded-xl h-full flex flex-col justify-between">
+            <div class="flex flex-col xl:flex-row xl:items-center justify-between border-b pb-3 mb-4 gap-4">
+              <div>
+                <h3 class="text-[10px] font-bold uppercase tracking-widest">Buku Kas Utama</h3>
+              </div>
+              <div class="flex flex-wrap items-center gap-2.5">
+                <div class="flex items-center gap-1.5 border-slate-700/50">
+                  <select id="exportMonth" class="premium-input text-[9px] font-bold rounded-lg py-1 px-2">
+                    <option value="all">Semua Bulan</option>
+                    <option value="0">Januari</option><option value="1">Februari</option><option value="2">Maret</option>
+                    <option value="3">April</option><option value="4">Mei</option><option value="5">Juni</option>
+                    <option value="6">Juli</option><option value="7">Agustus</option><option value="8">September</option>
+                    <option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
+                  </select>
+                  <select id="exportYear" class="premium-input text-[9px] font-bold rounded-lg py-1 px-2">
+                    <option value="all">Semua Tahun</option>
+                    <option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option>
+                  </select>
+                  <button onclick="downloadCSVReport()" class="bg-emerald-600 text-white text-[9px] font-bold py-1 px-2.5 rounded-lg">CSV</button>
+                </div>
+                <div class="flex gap-2 w-full sm:w-auto">
+                  <input type="text" id="txSearch" oninput="resetPageAndFilter()" class="premium-input text-[10px] font-semibold rounded-lg py-1.5 px-3 placeholder-slate-500" placeholder="Cari...">
+                  <select id="txFilterType" onchange="resetPageAndFilter()" class="premium-input text-[10px] font-semibold rounded-lg py-1.5 px-3">
+                    <option value="Semua">Semua Aliran</option>
+                    <option value="Pemasukan">Pemasukan (+)</option>
+                    <option value="Pengeluaran">Pengeluaran (-)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="relative">
+              <div class="overflow-x-auto rounded-lg border max-h-[380px]">
+                <table class="w-full text-left border-collapse min-w-[600px] md:min-w-0">
+                  <thead class="sticky top-0 z-10 bg-[#0d1424]">
+                    <tr class="bg-black/40 border-b text-[9px] uppercase font-bold tracking-widest">
+                      <th class="py-2.5 px-3 border-r">Waktu</th>
+                      <th class="py-2.5 px-3 border-r">Jenis</th>
+                      <th class="py-2.5 px-3 border-r">Saku Alokasi</th>
+                      <th class="py-2.5 px-3 border-r text-right">Nominal</th>
+                      <th class="py-2.5 px-3 border-r">Catatan</th>
+                      <th class="py-2.5 px-3 text-center">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="transactionTableBody" class="text-[10px] divide-y divide-slate-800/20"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-between items-center mt-4 pt-3 border-t gap-3">
+              <span id="paginationInfo" class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Mencari Data...</span>
+              <div id="transactionPagination" class="flex items-center gap-1.5 text-[10px] font-bold"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB: MANAGE POCKETS -->
+        <section id="tab-pockets" class="tab-content hidden space-y-5">
+          <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
+            <div class="premium-panel p-5 rounded-xl h-fit">
+              <div class="border-b pb-2 mb-3">
+                <h3 class="text-[10px] font-bold uppercase tracking-widest">Buat Saku Kustom</h3>
+              </div>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Nama Saku</label>
+                  <input type="text" id="pocketNewName" class="w-full py-1.5 px-2.5 premium-input text-[10px] font-bold rounded-lg">
+                </div>
+                <div>
+                  <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Porsi Alokasi (%)</label>
+                  <input type="number" id="pocketNewPercentage" class="w-full py-1.5 px-2.5 premium-input text-[10px] font-bold rounded-lg font-monospace">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Ikon</label>
+                    <select id="pocketNewIcon" class="w-full premium-input py-1.5 px-2 text-[10px] font-bold rounded-lg">
+                      <option value="fa-solid fa-house">🏠 Rumah Tangga</option>
+                      <option value="fa-solid fa-cart-shopping">🛒 Belanja</option>
+                      <option value="fa-solid fa-gamepad">🎮 Hiburan</option>
+                      <option value="fa-solid fa-piggy-bank">🐷 Tabungan</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Warna</label>
+                    <select id="pocketNewColor" class="w-full premium-input py-1.5 px-2 text-[10px] font-bold rounded-lg">
+                      <option value="#3b82f6">Ocean Blue</option>
+                      <option value="#10b981">Emerald Green</option>
+                      <option value="#ec4899">Pink Rose</option>
+                    </select>
+                  </div>
+                </div>
+                <button onclick="createCustomPocket()" class="w-full btn-gradient-emerald text-white py-2 font-bold uppercase text-[10px] rounded-lg">Simpan Saku</button>
+              </div>
+            </div>
+
+            <div class="premium-panel p-5 rounded-xl xl:col-span-2">
+              <div class="border-b pb-2 mb-4">
+                <h3 class="text-[10px] font-bold uppercase tracking-widest">Struktur Distribusi Saku Aktif</h3>
+              </div>
+              <div class="space-y-2.5 max-h-[350px] overflow-y-auto" id="pocketConfigList"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB: TRANSFER -->
+        <section id="tab-transfer" class="tab-content hidden space-y-5">
+          <div class="premium-panel p-6 max-w-lg mx-auto rounded-xl">
+            <div class="border-b pb-2 mb-4 text-center">
+              <h3 class="text-[10px] font-bold uppercase tracking-widest">Pindah Saldo Antar Saku</h3>
+            </div>
+            <div class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Saku Pengirim</label>
+                  <select id="transferSource" class="w-full premium-input py-1.5 px-2.5 text-[10px] font-bold rounded-lg"></select>
+                </div>
+                <div>
+                  <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Saku Penerima</label>
+                  <select id="transferTarget" class="w-full premium-input py-1.5 px-2.5 text-[10px] font-bold rounded-lg"></select>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="block text-[8px] font-bold uppercase tracking-wider">Nominal Transfer (Rp)</label>
+                  <span id="transferAmountFormatted" class="text-[9px] font-bold font-monospace text-blue-400">Rp 0</span>
+                </div>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-blue-400 text-[10px] font-bold font-monospace">Rp</span>
+                  <input type="number" id="transferAmount" oninput="liveFormatCurrency('transferAmount', 'transferAmountFormatted')" class="w-full pl-8 pr-2.5 py-1.5 premium-input text-[10px] font-bold rounded-lg font-monospace">
+                </div>
+              </div>
+              <button onclick="handleTransfer()" class="w-full btn-gradient-blue text-white py-2 font-bold uppercase text-[10px] rounded-lg">Eksekusi Transfer</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // =========================================================================
+    // PASTE URL WEB APP HASIL DEPLOY GOOGLE APPS SCRIPT ANDA DI BAWAH INI:
+    // =========================================================================
+    const GAS_WEB_APP_URL = "URL_DEPLOYN_GAS_ANDA"; 
+
+    let session = { sheetId: "", email: "" };
+    let globalPockets = [];
+    let globalTransactions = [];
+    let donutChartInstance = null;
+    let isMockMode = false;
+    let currentAuthState = 'login';
+    const sessionTimeout = 15 * 60 * 1000;
+    let currentPage = 1;
+    const rowsPerPage = 10;
+    let currentConfirmCallback = null;
+
+    // DETEKSI OTOMATIS MODE DEMO ATAU PRODUCTION ONLINE
+    if (GAS_WEB_APP_URL === "" || GAS_WEB_APP_URL === "URL_DEPLOYN_GAS_ANDA") {
+      isMockMode = true;
+      document.getElementById('demoBadge').classList.remove('hidden');
+    }
+
+    // BRIDGE API UTAMA MENGGANTIKAN google.script.run
+    async function executeCloudApi(actionName, payloadData = {}) {
+      if (isMockMode) return null;
+      try {
+        const response = await fetch(GAS_WEB_APP_URL, {
+          method: "POST",
+          mode: "cors",
+          body: JSON.stringify({ action: actionName, payload: payloadData }),
+          headers: { "Content-Type": "text/plain;charset=utf-8" }
+        });
+        return await response.json();
+      } catch (err) {
+        showCustomAlert("Kesalahan Jaringan", "Gagal menghubungi server API Cloud: " + err.toString(), "error");
+        return { success: false, message: err.toString() };
+      }
+    }
+
+    function isInvestmentPocket(name) { return /tabungan|saham|investasi|reksadana|deposito|savings|investment/i.test(name); }
+    function formatRupiah(amount) { return "Rp " + parseFloat(amount).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
+    
+    function formatDateTimeConsistent(dateInput) {
+      const date = new Date(dateInput);
+      if (isNaN(date.getTime())) return "-";
+      const day = String(date.getDate()).padStart(2, '0');
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      return `${day} ${months[date.getMonth()]} ${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
+    }
+
+    function liveFormatCurrency(inputId, outputId) { liveFormatCurrencyRaw(inputId, outputId); }
+    function liveFormatCurrencyRaw(inputId, outputId) {
+      const val = parseFloat(document.getElementById(inputId).value) || 0;
+      document.getElementById(outputId).innerText = formatRupiah(val);
+    }
+
+    function showCustomAlert(title, message, type = 'info') {
+      const modal = document.getElementById('customAlertModal');
+      const titleEl = document.getElementById('customAlertTitle');
+      const msgEl = document.getElementById('customAlertMessage');
+      const iconBg = document.getElementById('customAlertIconBg');
+      const icon = document.getElementById('customAlertIcon');
+      titleEl.innerText = title; msgEl.innerText = message;
+      iconBg.className = "w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl border";
+      icon.className = "fa-solid";
+      if (type === 'error') { iconBg.classList.add('bg-red-500/10', 'text-red-500', 'border-red-500/20'); icon.classList.add('fa-circle-xmark'); }
+      else if (type === 'success') { iconBg.classList.add('bg-emerald-500/10', 'text-emerald-500', 'border-emerald-500/20'); icon.classList.add('fa-circle-check'); }
+      else if (type === 'warning') { iconBg.classList.add('bg-amber-500/10', 'text-amber-500', 'border-amber-500/20'); icon.classList.add('fa-triangle-exclamation'); }
+      else { iconBg.classList.add('bg-blue-500/10', 'text-blue-500', 'border-blue-500/20'); icon.classList.add('fa-circle-info'); }
+      modal.classList.remove('hidden');
+    }
+    function closeCustomAlert() { document.getElementById('customAlertModal').classList.add('hidden'); }
+
+    function showCustomConfirm(title, message, onConfirmCallback) {
+      document.getElementById('customConfirmTitle').innerText = title;
+      document.getElementById('customConfirmMessage').innerText = message;
+      currentConfirmCallback = onConfirmCallback;
+      document.getElementById('customConfirmModal').classList.remove('hidden');
+    }
+    function closeCustomConfirm(isConfirmed) {
+      document.getElementById('customConfirmModal').classList.add('hidden');
+      if (isConfirmed && currentConfirmCallback) currentConfirmCallback();
+      currentConfirmCallback = null;
+    }
+
+    function openEditPocketModal(pocketName) {
+      let p = globalPockets.find(item => item.name === pocketName); if (!p) return;
+      document.getElementById('editPocketOldName').value = p.name;
+      document.getElementById('editPocketName').value = p.name;
+      document.getElementById('editPocketPercentage').value = p.percentage;
+      document.getElementById('editPocketIcon').value = p.icon;
+      document.getElementById('editPocketColor').value = p.color;
+      document.getElementById('editPocketModal').classList.remove('hidden');
+    }
+    function closeEditPocketModal() { document.getElementById('editPocketModal').classList.add('hidden'); }
+
+    async function saveEditPocket() {
+      let oldName = document.getElementById('editPocketOldName').value;
+      let newName = document.getElementById('editPocketName').value.trim();
+      let percentage = parseFloat(document.getElementById('editPocketPercentage').value) || 0;
+      let icon = document.getElementById('editPocketIcon').value;
+      let color = document.getElementById('editPocketColor').value;
+
+      if (!newName || percentage <= 0) { showCustomAlert("Data Salah", "Isi parameter saku secara lengkap!", "error"); return; }
+      let otherTotal = globalPockets.filter(p => p.name !== oldName).reduce((sum, p) => sum + p.percentage, 0);
+      if (otherTotal + percentage > 100) { showCustomAlert("Gagal", `Alokasi melebihi batas 100% (Sisa kuota: ${100 - otherTotal}%).`, "error"); return; }
+
+      if (isMockMode) {
+        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY));
+        let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
+        pockets.forEach(p => { if (p.name === oldName) { p.name = newName; p.percentage = percentage; p.icon = icon; p.color = color; } });
+        if (oldName !== newName) transactions.forEach(t => { if (t.pocket === oldName) t.pocket = newName; });
+        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets));
+        localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+        closeEditPocketModal(); loadAllSystemData();
+        showCustomAlert("Sukses", "Perubahan saku lokal disimpan.", "success");
+      } else {
+        let res = await executeCloudApi('updatePocket', { sheetId: session.sheetId, oldName, newName, percentage, color, icon });
+        if (res && res.success) { closeEditPocketModal(); loadAllSystemData(); showCustomAlert("Sukses", "Saku tersinkronisasi ke cloud.", "success"); }
+      }
+    }
+
+    function openDeletePocketModal(pocketName) {
+      if (globalPockets.length <= 1) { showCustomAlert("Batal", "Sistem membutuhkan minimal satu saku aktif!", "error"); return; }
+      document.getElementById('deletePocketSource').value = pocketName;
+      document.getElementById('deletePocketHeading').innerText = `Saku "${pocketName}" akan dihapus. Pilih target pelimpahan anggaran kalkulasi saldo:`;
+      let targetDropdown = document.getElementById('deletePocketTarget'); targetDropdown.innerHTML = "";
+      globalPockets.forEach(p => {
+        if (p.name !== pocketName) {
+          let opt = document.createElement('option'); opt.value = p.name;
+          opt.innerText = `${p.name} (Saldo: ${formatRupiah(p.remaining)})`; targetDropdown.appendChild(opt);
+        }
+      });
+      document.getElementById('deletePocketModal').classList.remove('hidden');
+    }
+    function closeDeletePocketModal() { document.getElementById('deletePocketModal').classList.add('hidden'); }
+
+    async function executeDeleteAndReallocate() {
+      let pocketToDelete = document.getElementById('deletePocketSource').value;
+      let targetPocket = document.getElementById('deletePocketTarget').value;
+      let redistributeMode = document.getElementById('deletePocketRedistribute').value;
+
+      if (isMockMode) {
+        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY));
+        let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
+        let delItem = pockets.find(p => p.name === pocketToDelete);
+        let tgtItem = pockets.find(p => p.name === targetPocket);
+        tgtItem.allocated += delItem.allocated; tgtItem.spent += delItem.spent;
+        if (redistributeMode === "target") tgtItem.percentage += delItem.percentage;
+        else {
+          let share = delItem.percentage / (pockets.length - 1);
+          pockets.forEach(p => { if (p.name !== pocketToDelete) p.percentage += share; });
+        }
+        transactions.forEach(t => { if (t.pocket === pocketToDelete) t.pocket = targetPocket; });
+        pockets = pockets.filter(p => p.name !== pocketToDelete);
+        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets));
+        localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+        closeDeletePocketModal(); loadAllSystemData(); showCustomAlert("Sukses", "Saku lokal dilebur.", "success");
+      } else {
+        let res = await executeCloudApi('deleteAndReallocatePocket', { sheetId: session.sheetId, pocketToDelete, targetPocket, redistributeMode });
+        if (res && res.success) { closeDeletePocketModal(); loadAllSystemData(); showCustomAlert("Sukses", "Peleburan cloud aman.", "success"); }
+      }
+    }
+
+    function checkEditTxType() {
+      let type = document.getElementById('editTxType').value;
+      document.getElementById('editTxPocketWrapper').style.display = (type === "Pemasukan") ? "none" : "block";
+    }
+
+    function openEditTransactionModal(txIndex) {
+      let t = globalTransactions.find(item => item.index === txIndex); if (!t) return;
+      document.getElementById('editTxIndex').value = txIndex;
+      document.getElementById('editTxType').value = t.type;
+      let editTxPocket = document.getElementById('editTxPocket'); editTxPocket.innerHTML = "";
+      globalPockets.forEach(p => {
+        let opt = document.createElement('option'); opt.value = p.name; opt.innerText = p.name; editTxPocket.appendChild(opt);
+      });
+      if (t.type === "Pengeluaran") document.getElementById('editTxPocket').value = t.pocket;
+      document.getElementById('editTxAmount').value = t.amount;
+      document.getElementById('editTxNotes').value = t.notes;
+      liveFormatCurrencyRaw('editTxAmount', 'editTxAmountFormatted');
+      checkEditTxType();
+      document.getElementById('editTransactionModal').classList.remove('hidden');
+    }
+    function closeEditTransactionModal() { document.getElementById('editTransactionModal').classList.add('hidden'); }
+
+    async function saveEditTransaction() {
+      let txIndex = parseInt(document.getElementById('editTxIndex').value);
+      let type = document.getElementById('editTxType').value;
+      let pocket = document.getElementById('editTxPocket').value;
+      let amount = parseFloat(document.getElementById('editTxAmount').value) || 0;
+      let notes = document.getElementById('editTxNotes').value.trim();
+      if (amount <= 0) { showCustomAlert("Input Error", "Masukkan nominal secara benar!", "error"); return; }
+
+      if (isMockMode) {
+        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)) || [];
+        let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY)) || [];
+        let tx = transactions.find(t => t.index === txIndex);
+        if (tx.type === "Pemasukan") pockets.forEach(p => { p.allocated = Math.max(0, p.allocated - (tx.amount * (p.percentage / 100))); });
+        else pockets.forEach(p => { if (p.name === tx.pocket) p.spent = Math.max(0, p.spent - tx.amount); });
+        
+        tx.type = type; tx.pocket = (type === "Pemasukan") ? "Semua" : pocket; tx.amount = amount; tx.notes = notes || "-";
+        if (type === "Pemasukan") pockets.forEach(p => { p.allocated += amount * (p.percentage / 100); p.remaining = p.allocated - p.spent; });
+        else pockets.forEach(p => { if (p.name === pocket) { p.spent += amount; p.remaining = p.allocated - p.spent; } });
+        
+        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets));
+        localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+        closeEditTransactionModal(); loadAllSystemData(); showCustomAlert("Sukses", "Kas lokal direkonsiliasi.", "success");
+      } else {
+        let res = await executeCloudApi('updateTransaction', { sheetId: session.sheetId, txIndex, type, pocketName: pocket, amount, notes });
+        if (res && res.success) { closeEditTransactionModal(); loadAllSystemData(); showCustomAlert("Sukses", "Kas cloud sinkron.", "success"); }
+      }
+    }
+
+    function downloadCSVReport() {
+      let monthFilter = document.getElementById('exportMonth').value;
+      let yearFilter = document.getElementById('exportYear').value;
+      let filtered = globalTransactions.filter(t => {
+        let d = new Date(t.date); if (isNaN(d.getTime())) return false;
+        return (monthFilter === "all" || d.getMonth().toString() === monthFilter) && (yearFilter === "all" || d.getFullYear().toString() === yearFilter);
+      });
+      if (filtered.length === 0) { showCustomAlert("Gagal", "Tidak ada data riwayat yang cocok.", "warning"); return; }
+      let csvContent = "\uFEFFDate,Type,Pocket,Amount,Notes\n";
+      filtered.forEach(t => { csvContent += `"${formatDateTimeConsistent(t.date)}","${t.type}","${t.pocket}",${t.amount},"${t.notes.replace(/"/g, '""')}"\n`; });
+      let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      let url = URL.createObjectURL(blob);
+      let link = document.createElement("a"); link.setAttribute("href", url);
+      link.setAttribute("download", `Laporan_Kas_${yearFilter}.csv`);
+      document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+
+    function toggleMobileSidebar() {
+      document.getElementById('sidebar').classList.toggle('-translate-x-full');
+      document.getElementById('sidebarOverlay').classList.toggle('hidden');
+    }
+
+    function saveSession(sheetId, email) {
+      localStorage.setItem('S_ID', sheetId); localStorage.setItem('S_EM', email);
+      localStorage.setItem('S_EX', (Date.now() + sessionTimeout).toString());
+    }
+    function clearSession() { localStorage.removeItem('S_ID'); localStorage.removeItem('S_EM'); localStorage.removeItem('S_EX'); }
+    function restoreSession() {
+      let ex = localStorage.getItem('S_EX'); if (!ex || Date.now() > parseInt(ex, 10)) { clearSession(); return false; }
+      session.sheetId = localStorage.getItem('S_ID'); session.email = localStorage.getItem('S_EM'); return true;
+    }
+
+    async function hashPassword(password) {
+      try {
+        const msgBuffer = new TextEncoder().encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+      } catch (e) { return "fb_" + password.length; }
+    }
+
+    function togglePasswordVisibility(inputId, iconId) {
+      let input = document.getElementById(inputId); let icon = document.getElementById(iconId);
+      if (input.type === 'password') { input.type = 'text'; icon.className = 'fa-solid fa-eye-slash'; }
+      else { input.type = 'password'; icon.className = 'fa-solid fa-eye'; }
+    }
+
+    function toggleTheme() {
+      let isL = document.body.classList.toggle('light-theme');
+      localStorage.setItem('THEME', isL ? 'light' : 'dark'); updateThemeUI(isL);
+    }
+    function initTheme() {
+      let isL = localStorage.getItem('THEME') === 'light';
+      if (isL) document.body.classList.add('light-theme'); else document.body.classList.remove('light-theme');
+      updateThemeUI(isL);
+    }
+    function updateThemeUI(isL) {
+      let btn = document.getElementById('themeToggleBtn'); if (!btn) return;
+      btn.innerHTML = isL ? `<i class="fa-solid fa-sun text-amber-500"></i> Terang` : `<i class="fa-solid fa-moon text-amber-400"></i> Gelap`;
+      if (globalPockets.length > 0) renderAnalyticsChart();
+    }
+
+    function initializeMockData() {
+      if (!localStorage.getItem(MOCK_POCKETS_KEY)) {
+        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify([
+          { name: "Kebutuhan Pokok", percentage: 50, allocated: 5000000, spent: 4200000, remaining: 800000, color: "#3b82f6", icon: "fa-solid fa-house" },
+          { name: "Tabungan", percentage: 50, allocated: 5000000, spent: 0, remaining: 5000000, color: "#10b981", icon: "fa-solid fa-piggy-bank" }
+        ]));
+      }
+      if (!localStorage.getItem(MOCK_TRANSACTIONS_KEY)) {
+        localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify([
+          { index: 1, date: new Date().toISOString(), type: "Pemasukan", pocket: "Semua", amount: 10000000, notes: "Gaji Pokok Awal" }
+        ]));
+      }
+      if (!localStorage.getItem(MOCK_USERS_KEY)) {
+        localStorage.setItem(MOCK_USERS_KEY, JSON.stringify([{ email: "demo@keluarga.com", password: "demo123", sheetId: "MOCK_ID" }]));
+      }
+    }
+
+    function setupUIOnLogin() {
+      document.getElementById('userDisplay').innerText = session.email;
+      document.getElementById('userInitial').innerText = session.email.charAt(0).toUpperCase();
+      document.getElementById('authContainer').classList.add('hidden');
+      document.getElementById('dashboardContainer').classList.remove('hidden');
+      loadAllSystemData();
+    }
+
+    async function loadAllSystemData() {
+      if (isMockMode) {
+        renderSystemState({ success: true, pockets: JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)), transactions: JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY)) });
+      } else {
+        let res = await executeCloudApi('getDashboardData', { sheetId: session.sheetId });
+        if (res) renderSystemState(res);
+      }
+    }
+
+    function logout() { clearSession(); location.reload(); }
+
+    function handleTransfer() {
+      let source = document.getElementById('transferSource').value;
+      let target = document.getElementById('transferTarget').value;
+      let amount = parseFloat(document.getElementById('transferAmount').value) || 0;
+      if (source === target || amount <= 0) { showCustomAlert("Gagal", "Validasi pemindahan dana tidak sesuai.", "error"); return; }
+      executeTransfer(source, target, amount);
+    }
+
+    async function executeTransfer(source, target, amount) {
+      if (isMockMode) {
+        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY));
+        pockets.forEach(p => { if (p.name === source) p.allocated -= amount; if (p.name === target) p.allocated += amount; p.remaining = p.allocated - p.spent; });
+        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets));
+        showCustomAlert("Sukses", "Dana teralihkan.", "success"); loadAllSystemData();
+      } else {
+        let res = await executeCloudApi('transferPocketFunds', { sheetId: session.sheetId, source, target, amount });
+        if (res && res.success) { showCustomAlert("Sukses", "Transfer eksekusi cloud sukses.", "success"); loadAllSystemData(); }
+      }
+    }
+
+    async function createCustomPocket() {
+      let name = document.getElementById('pocketNewName').value.trim();
+      let percentage = parseFloat(document.getElementById('pocketNewPercentage').value) || 0;
+      let icon = document.getElementById('pocketNewIcon').value;
+      let color = document.getElementById('pocketNewColor').value;
+      if (!name || percentage <= 0) return;
+
+      if (isMockMode) {
+        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)) || [];
+        pockets.push({ name, percentage, allocated: 0, spent: 0, remaining: 0, color, icon });
+        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets));
+        loadAllSystemData(); showCustomAlert("Sukses", "Saku baru dibuat.", "success");
+      } else {
+        let res = await executeCloudApi('addCustomPocket', { sheetId: session.sheetId, name, percentage, color, icon });
+        if (res && res.success) { loadAllSystemData(); showCustomAlert("Sukses", "Saku cloud bertambah.", "success"); }
+      }
+    }
+
+    function resetPageAndFilter() { currentPage = 1; filterTransactions(); }
+
+    function filterTransactions() {
+      let query = document.getElementById('txSearch').value.toLowerCase();
+      let typeFilter = document.getElementById('txFilterType').value;
+      let tbody = document.getElementById('transactionTableBody'); if (!tbody) return; tbody.innerHTML = "";
+
+      let filtered = globalTransactions.filter(t => (t.notes.toLowerCase().includes(query) || t.pocket.toLowerCase().includes(query)) && (typeFilter === "Semua" || t.type === typeFilter));
+      let totalPages = Math.ceil(filtered.length / rowsPerPage);
+      renderPaginationControls(totalPages);
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Tidak ada riwayat</td></tr>`; return;
+      }
+      let paginated = filtered.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+      paginated.forEach(t => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-500/5">
+            <td class="py-2 px-3 font-monospace">${formatDateTimeConsistent(t.date)}</td>
+            <td class="py-2 px-3">${t.type === "Pemasukan" ? "📈 MASUK" : "📉 KELUAR"}</td>
+            <td class="py-2 px-3 font-bold text-slate-400">${t.pocket}</td>
+            <td class="py-2 px-3 text-right font-bold">${formatRupiah(t.amount)}</td>
+            <td class="py-2 px-3">${t.notes}</td>
+            <td class="py-2 px-3 text-center">
+              <button onclick="openEditTransactionModal(${t.index})" class="text-blue-500 mx-1"><i class="fa-solid fa-edit"></i></button>
+              <button onclick="handleDeleteTransaction(${t.index})" class="text-red-500 mx-1"><i class="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>`;
+      });
+    }
+
+    function renderPaginationControls(totalPages) {
+      let container = document.getElementById('transactionPagination'); if (!container) return; container.innerHTML = "";
+      for (let i = 1; i <= totalPages; i++) {
+        let btn = document.createElement('button'); btn.className = `px-2 py-1 mx-0.5 rounded border ${currentPage === i ? 'bg-blue-600 text-white' : ''}`;
+        btn.innerText = i; btn.onclick = () => { currentPage = i; filterTransactions(); }; container.appendChild(btn);
+      }
+    }
+
+    function renderSystemState(res) {
+      if (!res || !res.success) return;
+      globalPockets = res.pockets || []; globalTransactions = res.transactions || [];
+      let pocketList = document.getElementById('pocketList'); pocketList.innerHTML = "";
+      
+      let totalBalance = 0;
+      globalPockets.forEach(p => {
+        totalBalance += (p.allocated - p.spent);
+        let pctUsed = p.allocated > 0 ? (p.spent / p.allocated) * 100 : 0;
+        let isInvest = isInvestmentPocket(p.name);
+        let barColor = isInvest ? '#10b981' : (p.spent > p.allocated ? '#ef4444' : p.color);
+
+        pocketList.innerHTML += `
+          <div class="premium-panel p-4 relative overflow-hidden rounded-xl">
+            <div class="absolute top-0 left-0 w-1.5 h-full" style="background-color: ${p.color}"></div>
+            <h4 class="font-bold text-xs truncate text-primary-theme">${p.name}</h4>
+            <p class="text-sm font-bold font-monospace">${formatRupiah(isInvest ? p.spent : p.remaining)}</p>
+            <div class="w-full bg-slate-500/10 h-1.5 rounded-full overflow-hidden mt-2">
+              <div class="h-full transition-all duration-500" style="width: ${Math.min(pctUsed, 100)}%; background-color: ${barColor}"></div>
+            </div>
+          </div>`;
+      });
+      document.getElementById('metricTotalBalance').innerText = formatRupiah(totalBalance);
+      filterTransactions(); renderAnalyticsChart();
+    }
+
+    function renderAnalyticsChart() {
+      let canvas = document.getElementById('pocketDonutChart'); if (!canvas) return;
+      let ctx = canvas.getContext('2d');
+      if (donutChartInstance) donutChartInstance.destroy();
+      donutChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: globalPockets.map(p => p.name),
+          datasets: [
+            { label: 'Budget', data: globalPockets.map(p => p.allocated), backgroundColor: '#3b82f6' },
+            { label: 'Realisasi', data: globalPockets.map(p => p.spent), backgroundColor: '#f43f5e' }
+          ]
+        },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+      });
+    }
+
+    let selectedFormType = "Pemasukan";
+    function setFormType(type) {
+      selectedFormType = type;
+      document.getElementById('formPocketWrapper').className = (type === "Pemasukan") ? "hidden" : "";
+    }
+
+    async function submitTransaction() {
+      let amount = document.getElementById('txAmount').value;
+      let notes = document.getElementById('txNotes').value;
+      let pocket = document.getElementById('txPocket').value;
+      if (!amount || parseFloat(amount) <= 0) return;
+
+      if (isMockMode) {
+        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY));
+        let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
+        transactions.unshift({ index: transactions.length + 1, date: new Date().toISOString(), type: selectedFormType, pocket: (selectedFormType === "Pemasukan") ? "Semua" : pocket, amount: parseFloat(amount), notes });
+        pockets.forEach(p => {
+          if (selectedFormType === "Pemasukan") p.allocated += parseFloat(amount) * (p.percentage / 100);
+          else if (p.name === pocket) p.spent += parseFloat(amount);
+          p.remaining = p.allocated - p.spent;
+        });
+        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets));
+        localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+        loadAllSystemData(); showCustomAlert("Sukses", "Kas disimpan.", "success");
+      } else {
+        let res = await executeCloudApi('addTransaction', { sheetId: session.sheetId, type: selectedFormType, pocketName: pocket, amount, notes, userEmail: session.email });
+        if (res && res.success) { loadAllSystemData(); showCustomAlert("Sukses", "Kas cloud tersimpan.", "success"); }
+      }
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(s => s.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabId).classList.remove('hidden');
+      if(document.getElementById(`btn-${tabId}`)) document.getElementById(`btn-${tabId}`).classList.add('active');
+    }
+
+    function switchAuthState(state) {
+      currentAuthState = state;
+      document.getElementById('passwordFieldGroup').style.display = (state === 'forgot' || state === 'reset') ? 'none' : 'block';
+      document.getElementById('resetFieldsGroup').className = (state === 'reset') ? 'space-y-4' : 'hidden';
+      document.getElementById('authButtons').className = (state === 'login') ? 'space-y-3' : 'hidden';
+      document.getElementById('registerButtons').className = (state === 'register') ? 'space-y-3' : 'hidden';
+      document.getElementById('forgotButtons').className = (state === 'forgot' || state === 'reset') ? 'space-y-3' : 'hidden';
+      document.getElementById('btnExecuteReset').className = (state === 'reset') ? 'w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase' : 'hidden';
+    }
+
+    async function handleAuthSubmit() {
+      if (currentAuthState === 'login') handleLogin();
+      else if (currentAuthState === 'register') handleRegister();
+    }
+
+    async function handleLogin() {
+      let email = document.getElementById('email').value.trim();
+      let pass = document.getElementById('password').value.trim();
+      let hashed = await hashPassword(pass);
+      if (isMockMode) {
+        let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY));
+        let match = users.find(u => u.email === email && u.password === pass);
+        if (match) { session.sheetId = match.sheetId; session.email = match.email; saveSession(session.sheetId, session.email); setupUIOnLogin(); }
+        else showCustomAlert("Gagal", "Password salah.", "error");
+      } else {
+        let res = await executeCloudApi('loginUser', { email, password: hashed });
+        if (res && res.success) { session.sheetId = res.sheetId; session.email = res.email; saveSession(session.sheetId, session.email); setupUIOnLogin(); }
+        else showCustomAlert("Gagal", "Kredensial cloud ditolak.", "error");
+      }
+    }
+
+    async function handleRegister() {
+      let email = document.getElementById('email').value.trim();
+      let pass = document.getElementById('password').value.trim();
+      let hashed = await hashPassword(pass);
+      if (isMockMode) {
+        let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY)) || [];
+        users.push({ email, password: pass, sheetId: "MOCK_" + Date.now() });
+        localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
+        showCustomAlert("Sukses", "User baru dibuat.", "success"); switchAuthState('login');
+      } else {
+        let res = await executeCloudApi('registerUser', { email, password: hashed });
+        if (res && res.success) { showCustomAlert("Sukses", "Database cloud dikonfigurasi.", "success"); switchAuthState('login'); }
+      }
+    }
+
+    async function handleDeleteTransaction(txIndex) {
+      showCustomConfirm("Hapus?", "Data kas akan dihapus dari riwayat saku?", async function() {
+        if (isMockMode) {
+          let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY));
+          let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
+          let tx = transactions.find(t => t.index === txIndex);
+          if (tx.type === "Pemasukan") pockets.forEach(p => { p.allocated -= tx.amount * (p.percentage / 100); });
+          else pockets.forEach(p => { if (p.name === tx.pocket) p.spent -= tx.amount; p.remaining = p.allocated - p.spent; });
+          transactions = transactions.filter(t => t.index !== txIndex);
+          localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets));
+          localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+          loadAllSystemData();
+        } else {
+          let res = await executeCloudApi('deleteTransaction', { sheetId: session.sheetId, txIndex });
+          if (res && res.success) loadAllSystemData();
+        }
+      });
+    }
+
+    window.onload = function() {
+      document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      initTheme();
+      if (restoreSession()) setupUIOnLogin();
+      else if (isMockMode) { initializeMockData(); document.getElementById('email').value = "demo@keluarga.com"; document.getElementById('password').value = "demo123"; }
+    };
+  </script>
+</body>
+</html>
