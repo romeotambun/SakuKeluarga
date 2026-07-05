@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SakuKeluarga - Hub Keuangan Keluarga</title>
-  <link rel="manifest" href="manifest.json">
   
   <!-- Tailwind CSS & FontAwesome Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -920,6 +919,158 @@
       });
     }
 
+    // RENDERING CORE STATE (PONDASI UTAMA SINKRONISASI TAMPILAN)
+    function renderSystemState(res) {
+      if (!res || !res.success) {
+        showCustomAlert("Sinkronisasi Bermasalah", res ? res.message : "Tidak ada respon dari database cloud", "error");
+        return;
+      }
+      
+      globalPockets = res.pockets || [];
+      globalTransactions = res.transactions || [];
+
+      let pocketList = document.getElementById('pocketList');
+      let txPocket = document.getElementById('txPocket');
+      let transferSource = document.getElementById('transferSource');
+      let transferTarget = document.getElementById('transferTarget');
+      let pocketConfigList = document.getElementById('pocketConfigList');
+
+      pocketList.innerHTML = "";
+      txPocket.innerHTML = "";
+      transferSource.innerHTML = "";
+      transferTarget.innerHTML = "";
+      pocketConfigList.innerHTML = "";
+
+      let totalBalance = 0;
+      let totalPercentAllocated = 0;
+      let checkOverbudget = false;
+      let listOverbudgetNames = [];
+
+      globalPockets.forEach(p => {
+        totalBalance += (p.allocated - p.spent);
+        totalPercentAllocated += p.percentage;
+
+        let opt1 = document.createElement('option');
+        opt1.value = p.name;
+        opt1.innerText = `${p.name} (Sisa: ${formatRupiah(p.remaining)})`;
+        txPocket.appendChild(opt1);
+
+        let opt2 = opt1.cloneNode(true);
+        transferSource.appendChild(opt2);
+
+        let opt3 = document.createElement('option');
+        opt3.value = p.name;
+        opt3.innerText = p.name;
+        transferTarget.appendChild(opt3);
+
+        if (p.spent > p.allocated && !isInvestmentPocket(p.name)) {
+          checkOverbudget = true;
+          listOverbudgetNames.push(p.name);
+        }
+
+        let isInvest = isInvestmentPocket(p.name);
+        let isWarning = isInvest ? (p.spent < p.allocated) : (p.spent > p.allocated);
+        let pctUsed = p.allocated > 0 ? (p.spent / p.allocated) * 100 : 0;
+        
+        let statusColor = p.color; 
+        if (isWarning) {
+          statusColor = '#ef4444'; 
+        } else if (isInvest) {
+          statusColor = '#10b981'; 
+        }
+
+        let saldoTextClass = isWarning ? 'text-red-500' : (isInvest ? 'text-emerald-400' : '');
+        let pIcon = p.icon || "fa-solid fa-wallet";
+        
+        let saldoLabel = isInvest ? "Total Terkumpul" : "Sisa Saldo";
+        let saldoValue = isInvest ? p.spent : p.remaining;
+        let useLabel = isInvest ? 'Terkumpul' : 'Pakai';
+        
+        let cardHtml = `
+          <div class="premium-panel p-4 relative overflow-hidden rounded-xl border transition-all duration-300">
+            <div class="absolute top-0 left-0 w-1.5 h-full" style="background-color: ${p.color}"></div>
+            <div class="flex justify-between items-start mb-3 pl-2">
+              <div class="w-8 h-8 flex items-center justify-center rounded-lg border shadow-sm" style="background-color: ${p.color}20; color: ${p.color}; border-color: ${p.color}40">
+                <i class="${pIcon} text-sm"></i>
+              </div>
+              <span class="text-[8px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded-lg border" style="background-color: ${p.color}15; color: ${p.color}; border-color: ${p.color}40">Porsi: ${p.percentage}%</span>
+            </div>
+            
+            <h4 class="font-bold text-xs truncate mb-1 pl-2 text-primary-theme">${p.name}</h4>
+            <div class="flex justify-between items-baseline mb-3 pl-2">
+              <p class="text-[8px] text-slate-500 uppercase font-semibold">${saldoLabel}</p>
+              <p class="text-sm font-bold font-monospace ${saldoTextClass}">${formatRupiah(saldoValue)}</p>
+            </div>
+
+            <div class="space-y-1.5 pl-2">
+              <div class="w-full bg-slate-500/10 border h-1.5 rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-500" style="width: ${Math.min(pctUsed, 100)}%; background-color: ${statusColor}"></div>
+              </div>
+              <div class="flex justify-between text-[8px] font-semibold uppercase">
+                <span class="text-slate-500">Alokasi: ${formatRupiah(p.allocated)}</span>
+                <span class="${saldoTextClass}">${pctUsed.toFixed(0)}% ${useLabel}</span>
+              </div>
+            </div>
+          </div>
+        `;
+        pocketList.innerHTML += cardHtml;
+
+        let configHtml = `
+          <div class="bg-black/10 p-3.5 border rounded-xl flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center border" style="background-color: ${p.color}15; color: ${p.color}; border-color: ${p.color}30">
+                <i class="${pIcon} text-xs"></i>
+              </div>
+              <span class="font-bold text-xs uppercase tracking-wider text-primary-theme">${p.name}</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-[9px] text-blue-400 font-bold bg-blue-950/20 border border-blue-500/20 px-2.5 py-0.5 rounded-lg uppercase">${p.percentage}% Alokasi</span>
+              <button onclick="openEditPocketModal('${p.name}')" class="text-blue-500 hover:text-white border border-transparent hover:border-blue-500 p-1.5 rounded-lg transition" title="Edit Kantong"><i class="fa-solid fa-pen text-xs"></i></button>
+              <button onclick="openDeletePocketModal('${p.name}')" class="text-red-500 hover:text-white border border-transparent hover:border-red-500 p-1.5 rounded-lg transition" title="Hapus & Realokasikan"><i class="fa-solid fa-trash-can text-xs"></i></button>
+            </div>
+          </div>
+        `;
+        pocketConfigList.innerHTML += configHtml;
+      });
+
+      let alertBox = document.getElementById('alertBox');
+      if (checkOverbudget) {
+        alertBox.classList.remove('hidden');
+        document.getElementById('alertMsg').innerText = `⚠️ PERINGATAN! Saku [ ${listOverbudgetNames.join(', ')} ] telah melewati batas rencana alokasi anggaran Anda!`;
+      } else {
+        alertBox.classList.add('hidden');
+      }
+
+      document.getElementById('metricTotalBalance').innerText = formatRupiah(totalBalance);
+      document.getElementById('metricTotalPercent').innerText = `${totalPercentAllocated}% / 100%`;
+
+      let totalIncome = globalTransactions.filter(t => t.type === "Pemasukan").reduce((sum, t) => sum + t.amount, 0);
+      let totalExpense = globalTransactions.filter(t => t.type === "Pengeluaran").reduce((sum, t) => sum + t.amount, 0);
+
+      document.getElementById('metricTotalIncome').innerText = formatRupiah(totalIncome);
+      document.getElementById('metricTotalExpense').innerText = formatRupiah(totalExpense);
+
+      let totalAllocatedSum = globalPockets.reduce((sum, p) => sum + p.allocated, 0);
+      let totalSpentSum = globalPockets.reduce((sum, p) => sum + p.spent, 0);
+      let utilizationRate = totalAllocatedSum > 0 ? (totalSpentSum / totalAllocatedSum) * 100 : 0;
+
+      document.getElementById('statTotalBudget').innerText = formatRupiah(totalAllocatedSum);
+      document.getElementById('statTotalActual').innerText = formatRupiah(totalSpentSum);
+      
+      let statUtilEl = document.getElementById('statUtilRate');
+      statUtilEl.innerText = `${utilizationRate.toFixed(1)}%`;
+      if (utilizationRate > 100) {
+        statUtilEl.className = "font-bold font-monospace text-red-500";
+      } else if (utilizationRate > 80) {
+        statUtilEl.className = "font-bold font-monospace text-amber-400";
+      } else {
+        statUtilEl.className = "font-bold font-monospace text-emerald-400";
+      }
+
+      renderAnalyticsChart();
+      filterTransactions();
+    }
+
     function formatDateTimeConsistent(dateInput) {
       const date = new Date(dateInput);
       if (isNaN(date.getTime())) return "-";
@@ -1410,7 +1561,7 @@
       document.getElementById('demoBadge').classList.remove('hidden');
     } else {
       isMockMode = false;
-      document.getElementById('demoBadge').classList.add('hidden');
+      document.getElementById('demoBadge').add ? document.getElementById('demoBadge').add('hidden') : document.getElementById('demoBadge').classList.add('hidden');
     }
 
     const MOCK_POCKETS_KEY = "JAGOFAMILY_MOCK_POCKETS_V5";
@@ -1426,8 +1577,6 @@
     document.addEventListener("DOMContentLoaded", function() {
       initTheme();
     });
-
-    fontFamily = 'Inter';
 
     function initTheme() {
       const savedTheme = localStorage.getItem('JAGOFAMILY_THEME');
@@ -1639,6 +1788,198 @@
           })
           .catch(function(err) {
             showCustomAlert("Kegagalan Cloud GAS", "Gagal membuat saku kustom: " + err.toString(), "error");
+          });
+      }
+    }
+
+    function renderAnalyticsChart() {
+      let ctx = document.getElementById('pocketDonutChart').getContext('2d');
+      let labels = globalPockets.map(p => p.name);
+      let dataAllocated = globalPockets.map(p => p.allocated);
+      let dataSpent = globalPockets.map(p => p.spent);
+
+      if (donutChartInstance) {
+        donutChartInstance.destroy();
+      }
+
+      if (labels.length === 0) return;
+
+      const isLight = document.body.classList.contains('light-theme');
+      const labelColor = isLight ? '#475569' : '#94a3b8';
+      const gridColor = isLight ? '#cbd5e1' : '#1e293b';
+
+      donutChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Alokasi Budget',
+              data: dataAllocated,
+              backgroundColor: '#3b82f6',
+              borderRadius: 6,
+              borderWidth: 0
+            },
+            {
+              label: 'Realisasi Pengeluaran',
+              data: dataSpent,
+              backgroundColor: '#f43f5e',
+              borderRadius: 6,
+              borderWidth: 0
+            }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                color: labelColor,
+                font: { size: 9, family: 'Inter', weight: 'bold' }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let label = context.dataset.label || '';
+                  if (label) label += ': ';
+                  if (context.raw !== null) label += formatRupiah(context.raw);
+                  return label;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: gridColor },
+              ticks: {
+                color: labelColor,
+                font: { size: 8, family: 'JetBrains Mono' },
+                callback: function(value) {
+                  if (value >= 1e6) return 'Rp ' + (value / 1e6) + 'jt';
+                  if (value >= 1e3) return 'Rp ' + (value / 1e3) + 'rb';
+                  return 'Rp ' + value;
+                }
+              }
+            },
+            y: {
+              grid: { display: false },
+              ticks: {
+                color: labelColor,
+                font: { size: 9, family: 'Inter', weight: 'bold' }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    let selectedFormType = "Pemasukan";
+    function setFormType(type) {
+      selectedFormType = type;
+      let btnIn = document.getElementById('btnFormIn');
+      let btnOut = document.getElementById('btnFormOut');
+      let pocketWrapper = document.getElementById('formPocketWrapper');
+
+      if (type === "Pemasukan") {
+        btnIn.className = "py-1.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg uppercase transition";
+        btnOut.className = "py-1.5 text-[10px] font-bold bg-transparent text-slate-500 border border-slate-500/10 hover:border-slate-500/20 rounded-lg uppercase transition";
+        pocketWrapper.classList.add('hidden');
+      } else {
+        btnOut.className = "py-1.5 text-[10px] font-bold bg-pink-500/20 text-pink-500 border border-pink-500/30 rounded-lg uppercase transition";
+        btnIn.className = "py-1.5 text-[10px] font-bold bg-transparent text-slate-500 border border-slate-500/10 hover:border-slate-500/20 rounded-lg uppercase transition";
+        pocketWrapper.classList.remove('hidden');
+      }
+    }
+
+    function submitTransaction() {
+      let amount = document.getElementById('txAmount').value;
+      let notes = document.getElementById('txNotes').value;
+      let pocket = document.getElementById('txPocket').value;
+      let amountVal = parseFloat(amount) || 0;
+
+      if (!amount || amountVal <= 0) {
+        showCustomAlert("Kesalahan Input", "Silakan masukkan nominal uang yang valid!", "error");
+        return;
+      }
+      if (selectedFormType === "Pengeluaran" && !pocket) {
+        showCustomAlert("Form Belum Lengkap", "Pilih kantong alokasi pengeluaran Anda!", "error");
+        return;
+      }
+
+      document.getElementById('btnSubmit').innerText = "MENYIMPAN DATA...";
+      document.getElementById('btnSubmit').disabled = true;
+
+      if (isMockMode) {
+        setTimeout(() => {
+          let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)) || [];
+          let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY)) || [];
+          let targetPocketName = (selectedFormType === "Pemasukan") ? "Semua" : pocket;
+
+          transactions.unshift({
+            index: transactions.length + 1,
+            date: new Date().toISOString(),
+            type: selectedFormType,
+            pocket: targetPocketName,
+            amount: amountVal,
+            notes: notes || "-"
+          });
+
+          if (selectedFormType === "Pemasukan") {
+            pockets.forEach(p => {
+              let alloc = amountVal * (p.percentage / 100);
+              p.allocated = (p.allocated || 0) + alloc;
+              p.remaining = p.allocated - p.spent;
+            });
+          } else {
+            pockets.forEach(p => {
+              if (p.name === pocket) {
+                p.spent = (p.spent || 0) + amountVal;
+                p.remaining = p.allocated - p.spent;
+              }
+            });
+          }
+
+          localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets));
+          localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+
+          document.getElementById('btnSubmit').innerText = "REKAM TRANSAKSI";
+          document.getElementById('btnSubmit').disabled = false;
+          document.getElementById('txAmount').value = "";
+          document.getElementById('txNotes').value = "";
+          document.getElementById('txAmountFormatted').innerText = "Rp 0";
+          
+          currentPage = 1; 
+          loadAllSystemData();
+          showCustomAlert("Pencatatan Sukses", "Data kas berhasil direkam dalam saku.", "success");
+        }, 800);
+      } else {
+        callGasBackend('addTransaction', [session.sheetId, selectedFormType, pocket, amount, notes, session.email])
+          .then(function(res) {
+            document.getElementById('btnSubmit').innerText = "REKAM TRANSAKSI";
+            document.getElementById('btnSubmit').disabled = false;
+            if (res && res.success) {
+              document.getElementById('txAmount').value = "";
+              document.getElementById('txNotes').value = "";
+              document.getElementById('txAmountFormatted').innerText = "Rp 0";
+              currentPage = 1; 
+              loadAllSystemData();
+              if (res.warning) {
+                showCustomAlert("Peringatan Anggaran", res.msg, "warning");
+              } else {
+                showCustomAlert("Transaksi Berhasil", "Sistem berhasil mencatatkan transaksi ke cloud.", "success");
+              }
+            } else {
+              showCustomAlert("Gagal Menyimpan", res ? res.message : "Gagal terhubung.", "error");
+            }
+          })
+          .catch(function(err) {
+            document.getElementById('btnSubmit').innerText = "REKAM TRANSAKSI";
+            document.getElementById('btnSubmit').disabled = false;
+            showCustomAlert("Kegagalan Cloud GAS", "Gagal menyimpan transaksi: " + err.toString(), "error");
           });
       }
     }
@@ -1979,6 +2320,152 @@
           }
         }
       );
+    }
+
+    function resetPageAndFilter() {
+      currentPage = 1;
+      filterTransactions();
+    }
+
+    function filterTransactions() {
+      let query = document.getElementById('txSearch').value.toLowerCase();
+      let typeFilter = document.getElementById('txFilterType').value;
+      let tbody = document.getElementById('transactionTableBody');
+
+      if (!tbody) return;
+      tbody.innerHTML = "";
+
+      let filtered = globalTransactions.filter(t => {
+        let matchQuery = t.notes.toLowerCase().includes(query) || t.pocket.toLowerCase().includes(query);
+        let matchType = typeFilter === "Semua" || t.type === typeFilter;
+        return matchQuery && matchType;
+      });
+
+      let totalPages = Math.ceil(filtered.length / rowsPerPage);
+      if (currentPage > totalPages) {
+        currentPage = Math.max(1, totalPages);
+      }
+
+      let startIdx = filtered.length > 0 ? (currentPage - 1) * rowsPerPage + 1 : 0;
+      let endIdx = Math.min(currentPage * rowsPerPage, filtered.length);
+      const infoEl = document.getElementById('paginationInfo');
+      if (infoEl) {
+        infoEl.innerText = 
+          filtered.length > 0 
+            ? `Menampilkan ${startIdx}-${endIdx} dari ${filtered.length} riwayat` 
+            : "Tidak ada riwayat transaksi";
+      }
+
+      renderPaginationControls(totalPages);
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-500 uppercase font-bold tracking-widest text-[9px]">Belum ada riwayat transaksi</td></tr>`;
+        return;
+      }
+
+      let startIndex = (currentPage - 1) * rowsPerPage;
+      let paginatedData = filtered.slice(startIndex, startIndex + rowsPerPage);
+
+      paginatedData.forEach(t => {
+        let dateStr = formatDateTimeConsistent(t.date);
+        
+        let typeBadge = t.type === "Pemasukan" 
+          ? `<span class="bg-emerald-950/20 text-emerald-400 font-bold text-[8px] px-2 py-0.5 border border-emerald-500/20 rounded-lg uppercase tracking-widest"><i class="fa-solid fa-arrow-trend-up"></i> MASUK</span>` 
+          : `<span class="bg-pink-950/20 text-pink-500 font-bold text-[8px] px-2 py-0.5 border border-pink-500/20 rounded-lg uppercase tracking-widest"><i class="fa-solid fa-arrow-trend-down"></i> KELUAR</span>`;
+        
+        let amountStyle = t.type === "Pemasukan" ? "text-emerald-400" : "text-pink-500";
+        let amountSign = t.type === "Pemasukan" ? "+" : "-";
+
+        let row = `
+          <tr class="hover:bg-slate-500/5 transition">
+            <td class="py-2 px-3 font-monospace border-r border-slate-500/10">${dateStr}</td>
+            <td class="py-2 px-3 border-r border-slate-500/10">${typeBadge}</td>
+            <td class="py-2 px-3 font-bold border-r border-slate-500/10 uppercase tracking-wider text-slate-400">${t.pocket}</td>
+            <td class="py-2 px-3 text-right ${amountStyle} font-bold font-monospace border-r border-slate-500/10">${amountSign} ${formatRupiah(t.amount)}</td>
+            <td class="py-2 px-3 max-w-xs truncate border-r border-slate-500/10" title="${t.notes}">${t.notes}</td>
+            <td class="py-2 px-3 text-center flex items-center justify-center gap-1.5 h-full">
+              <button onclick="openEditTransactionModal(${t.index})" class="text-blue-500 hover:text-white border border-transparent hover:border-blue-500 p-1 rounded-lg transition" title="Edit Transaksi">
+                <i class="fa-solid fa-pen-to-square text-xs"></i>
+              </button>
+              <button onclick="handleDeleteTransaction(${t.index})" class="text-red-500 hover:text-white border border-transparent hover:border-red-500 p-1 rounded-lg transition" title="Hapus Transaksi">
+                <i class="fa-solid fa-trash-can text-xs"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+    }
+
+    function renderPaginationControls(totalPages) {
+      let pgContainer = document.getElementById('transactionPagination');
+      if (!pgContainer) return;
+
+      pgContainer.innerHTML = "";
+      if (totalPages <= 1) return;
+
+      let prevBtn = document.createElement('button');
+      prevBtn.className = `px-2.5 py-1 rounded-lg border transition duration-200 uppercase text-[9px] ${
+        currentPage === 1 
+          ? 'opacity-30 cursor-not-allowed border-slate-800' 
+          : 'border-slate-700 hover:bg-blue-600 hover:border-blue-600 hover:text-white'
+      }`;
+      prevBtn.style.color = currentPage === 1 ? 'var(--text-secondary)' : 'var(--text-primary)';
+      prevBtn.innerHTML = '<i class="fa-solid fa-chevron-left text-[8px]"></i>';
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.onclick = () => { currentPage--; filterTransactions(); };
+      pgContainer.appendChild(prevBtn);
+
+      let pages = [];
+      if (totalPages <= 5) {
+        for (let i = 1; i <= totalPages; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        if (currentPage > 3) pages.push('...');
+        let start = Math.max(2, currentPage - 1);
+        let end = Math.min(totalPages - 1, currentPage + 1);
+        for (let i = start; i <= end; i++) {
+          if (!pages.includes(i)) pages.push(i);
+        }
+        if (currentPage < totalPages - 2) pages.push('...');
+        if (!pages.includes(totalPages)) pages.push(totalPages);
+      }
+
+      pages.forEach(p => {
+        if (p === '...') {
+          let span = document.createElement('span');
+          span.className = "px-2 text-slate-500 font-bold select-none";
+          span.innerText = "...";
+          pgContainer.appendChild(span);
+        } else {
+          let btn = document.createElement('button');
+          btn.className = `w-7 h-7 flex items-center justify-center rounded-lg border transition duration-200 text-[9px] font-bold ${
+            currentPage === p 
+              ? 'btn-gradient-blue text-white border-blue-600' 
+              : 'border-slate-800 hover:border-blue-500'
+          }`;
+          if (currentPage !== p) {
+            btn.style.color = 'var(--text-primary)';
+            btn.style.backgroundColor = 'var(--bg-input)';
+            btn.style.borderColor = 'var(--border-color)';
+          }
+          btn.innerText = p;
+          btn.onclick = () => { currentPage = p; filterTransactions(); };
+          pgContainer.appendChild(btn);
+        }
+      });
+
+      let nextBtn = document.createElement('button');
+      nextBtn.className = `px-2.5 py-1 rounded-lg border transition duration-200 uppercase text-[9px] ${
+        currentPage === totalPages 
+          ? 'opacity-30 cursor-not-allowed border-slate-800' 
+          : 'border-slate-700 hover:bg-blue-600 hover:border-blue-600 hover:text-white'
+      }`;
+      nextBtn.style.color = currentPage === totalPages ? 'var(--text-secondary)' : 'var(--text-primary)';
+      nextBtn.innerHTML = '<i class="fa-solid fa-chevron-right text-[8px]"></i>';
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.onclick = () => { currentPage++; filterTransactions(); };
+      pgContainer.appendChild(nextBtn);
     }
 
     window.onload = function() {
