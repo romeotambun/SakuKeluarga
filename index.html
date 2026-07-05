@@ -680,7 +680,12 @@
     // =========================================================================
     // PASTE URL WEB APP HASIL DEPLOY GOOGLE APPS SCRIPT ANDA DI BAWAH INI:
     // =========================================================================
-    const GAS_WEB_APP_URL = "URL_DEPLOYN_GAS_ANDA"; 
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzVI801F3yz0Iv8tijK34Dkla9WFV9SkIX8u0l_QCEg0A4vxTdDic7ssuZIIqcfDKax/exec"; 
+
+    // KUNCI LOCAL STORAGE (MENGHINDARI BUG 'NOT DEFINED')
+    const MOCK_POCKETS_KEY = "JAGOFAMILY_MOCK_POCKETS_V5";
+    const MOCK_TRANSACTIONS_KEY = "JAGOFAMILY_MOCK_TRANSACTIONS_V5";
+    const MOCK_USERS_KEY = "JAGOFAMILY_MOCK_USERS_V5";
 
     let session = { sheetId: "", email: "" };
     let globalPockets = [];
