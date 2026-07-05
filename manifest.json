@@ -4,7 +4,7 @@
   "description": "Sistem Aplikasi Pengelolaan Keuangan Keluarga Terdistribusi",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/10149/10149451.png",
+      "src": "icon.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"
