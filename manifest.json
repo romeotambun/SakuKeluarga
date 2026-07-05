@@ -1,10 +1,10 @@
 {
-  "name": "Aplikasi Google Apps Script",
-  "short_name": "GAS App",
-  "start_url": "Index.html",
+  "name": "SakuKeluarga Hub Keuangan",
+  "short_name": "SakuKeluarga",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4285F4",
+  "background_color": "#060913",
+  "theme_color": "#3b82f6",
   "icons": [
     {
       "src": "icon-192.png",
