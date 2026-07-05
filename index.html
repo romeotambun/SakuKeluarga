@@ -5,49 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SakuKeluarga - Hub Keuangan Keluarga</title>
   
-  <!-- Tailwind CSS & FontAwesome Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- Chart.js for premium analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
-  <!-- Google Font: Inter & JetBrains Mono -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg-main: #060913;
-      --bg-sidebar: #090d1a;
-      --bg-panel: #0d1424;
-      --border-panel: rgba(59, 130, 246, 0.2);
-      --border-panel-hover: rgba(59, 130, 246, 0.45);
-      --bg-input: #050811;
-      --border-input: rgba(59, 130, 246, 0.25);
-      --text-primary: #f8fafc;
-      --text-secondary: #94a3b8;
+      --bg-main: #060913; --bg-sidebar: #090d1a; --bg-panel: #0d1424;
+      --border-panel: rgba(59, 130, 246, 0.2); --border-panel-hover: rgba(59, 130, 246, 0.45);
+      --bg-input: #050811; --border-input: rgba(59, 130, 246, 0.25);
+      --text-primary: #f8fafc; --text-secondary: #94a3b8;
       --shadow-panel: 0 10px 30px rgba(0, 0, 0, 0.5);
-      --header-bg: #090d1a;
-      --border-color: rgba(59, 130, 246, 0.15);
-      --card-inner-bg: #10182c;
-      --modal-bg: #0b1120;
+      --header-bg: #090d1a; --border-color: rgba(59, 130, 246, 0.15);
+      --card-inner-bg: #10182c; --modal-bg: #0b1120;
     }
-
     .light-theme {
-      --bg-main: #f1f5f9;
-      --bg-sidebar: #ffffff;
-      --bg-panel: #ffffff;
-      --border-panel: #cbd5e1;
-      --border-panel-hover: #1e293b;
-      --bg-input: #ffffff;
-      --border-input: #64748b;
-      --text-primary: #0f172a;
-      --text-secondary: #334155;
+      --bg-main: #f1f5f9; --bg-sidebar: #ffffff; --bg-panel: #ffffff;
+      --border-panel: #cbd5e1; --border-panel-hover: #1e293b;
+      --bg-input: #ffffff; --border-input: #64748b;
+      --text-primary: #0f172a; --text-secondary: #334155;
       --shadow-panel: 0 10px 25px rgba(15, 23, 42, 0.08);
-      --header-bg: #ffffff;
-      --border-color: #cbd5e1;
-      --card-inner-bg: #f8fafc;
-      --modal-bg: #ffffff;
+      --header-bg: #ffffff; --border-color: #cbd5e1;
+      --card-inner-bg: #f8fafc; --modal-bg: #ffffff;
     }
 
     .light-theme .text-slate-500, .light-theme .text-slate-400 { color: #334155 !important; }
@@ -59,44 +39,24 @@
     .light-theme .nav-btn:hover { background: rgba(59, 130, 246, 0.05) !important; color: #2563eb !important; }
     .light-theme .nav-btn.active { background: rgba(59, 130, 246, 0.1) !important; color: #2563eb !important; }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg-main);
-      color: var(--text-primary);
-      transition: background-color 0.3s ease, color 0.3s ease;
-    }
-    
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-primary); transition: background-color 0.3s ease, color 0.3s ease; }
     .font-monospace { font-family: 'JetBrains Mono', monospace; }
-
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: var(--bg-sidebar); }
     ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 9999px; }
-
-    .premium-panel {
-      background: var(--bg-panel);
-      border: 1px solid var(--border-panel);
-      box-shadow: var(--shadow-panel);
-      transition: all 0.3s ease;
-    }
+    .premium-panel { background: var(--bg-panel); border: 1px solid var(--border-panel); box-shadow: var(--shadow-panel); transition: all 0.3s ease; }
     .premium-panel:hover { border-color: var(--border-panel-hover); }
-
     .nav-btn { position: relative; transition: all 0.2s ease-in-out; color: var(--text-secondary); }
-    .nav-btn::before {
-      content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%) scaleY(0);
-      width: 4px; height: 24px; background-color: #3b82f6; border-radius: 0 4px 4px 0; transition: all 0.2s ease-in-out;
-    }
+    .nav-btn::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%) scaleY(0); width: 4px; height: 24px; background-color: #3b82f6; border-radius: 0 4px 4px 0; transition: all 0.2s ease-in-out; }
     .nav-btn.active { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
     .nav-btn.active::before { transform: translateY(-50%) scaleY(1); }
-
     .premium-input { background-color: var(--bg-input); border: 1px solid var(--border-input); color: var(--text-primary); transition: all 0.2s ease-in-out; }
     .premium-input:focus { border-color: #3b82f6; outline: none; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); }
-
     aside { background-color: var(--bg-sidebar) !important; border-color: var(--border-color) !important; transition: background-color 0.3s ease, border-color 0.3s ease; }
     header { background-color: var(--header-bg) !important; border-color: var(--border-color) !important; transition: background-color 0.3s ease, border-color 0.3s ease; }
     main { background-color: var(--bg-main) !important; }
     .card-profile { background-color: var(--card-inner-bg) !important; border-color: var(--border-color) !important; }
     .custom-modal-box { background-color: var(--modal-bg); border: 1px solid var(--border-panel-hover); }
-
     .text-primary-theme { color: var(--text-primary) !important; }
     .text-secondary-theme { color: var(--text-secondary) !important; }
     .btn-gradient-blue { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
@@ -138,7 +98,7 @@
   <!-- EDIT POCKET MODAL -->
   <div id="editPocketModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
     <div class="custom-modal-box max-w-md w-full p-6 rounded-2xl shadow-2xl border">
-      <h3 class="text-base font-bold tracking-tight mb-4 border-b pb-2 text-primary-theme"><i class="fa-solid fa-edit text-blue-500 mr-2"></i>Edit Kantong Keuangan</h3>
+      <h3 class="text-base font-bold tracking-tight mb-4 border-b pb-2 text-primary-theme"><i class="fa-solid fa-edit text-blue-500 mr-2"></i>Edit Kantong</h3>
       <input type="hidden" id="editPocketOldName">
       <div class="space-y-4">
         <div>
@@ -178,7 +138,7 @@
       </div>
       <div class="grid grid-cols-2 gap-3 mt-6">
         <button onclick="closeEditPocketModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl font-bold text-xs uppercase border border-slate-700">Batal</button>
-        <button onclick="saveEditPocket()" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase">Simpan Perubahan</button>
+        <button onclick="saveEditPocket()" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase">Simpan</button>
       </div>
     </div>
   </div>
@@ -186,28 +146,26 @@
   <!-- DELETE POCKET MODAL -->
   <div id="deletePocketModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
     <div class="custom-modal-box max-w-md w-full p-6 rounded-2xl shadow-2xl border">
-      <div class="w-12 h-12 rounded-full bg-red-500/10 text-red-500 border border-red-500/20 flex items-center justify-center text-xl mx-auto mb-3">
-        <i class="fa-solid fa-trash-can"></i>
-      </div>
+      <div class="w-12 h-12 rounded-full bg-red-500/10 text-red-500 border border-red-500/20 flex items-center justify-center text-xl mx-auto mb-3"><i class="fa-solid fa-trash-can"></i></div>
       <h3 class="text-base font-bold tracking-tight text-center mb-1 text-primary-theme">Hapus & Realokasi Saku</h3>
       <p id="deletePocketHeading" class="text-[11px] text-secondary-theme text-center mb-6 leading-relaxed font-semibold"></p>
       <input type="hidden" id="deletePocketSource">
       <div class="space-y-4">
         <div>
-          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-secondary-theme">Langkah 1: Alihkan Seluruh Saldo & Pengeluaran ke:</label>
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-secondary-theme">Alihkan Seluruh Saldo ke:</label>
           <select id="deletePocketTarget" class="w-full premium-input py-2.5 px-3 text-xs font-bold rounded-xl"></select>
         </div>
         <div>
-          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-secondary-theme">Langkah 2: Skema Redistribusi Persentase Alokasi (%):</label>
+          <label class="block text-[10px] font-bold uppercase tracking-wider mb-1.5 text-secondary-theme">Redistribusi Persentase (%):</label>
           <select id="deletePocketRedistribute" class="w-full premium-input py-2.5 px-3 text-xs font-bold rounded-xl">
-            <option value="target">Gabungkan Persentase ke Kantong Penerima</option>
-            <option value="split">Bagi Rata Sisa Persentase ke Seluruh Kantong Aktif</option>
+            <option value="target">Gabungkan ke Penerima</option>
+            <option value="split">Bagi Rata ke Seluruh Kantong</option>
           </select>
         </div>
       </div>
       <div class="grid grid-cols-2 gap-3 mt-6">
         <button onclick="closeDeletePocketModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl font-bold text-xs uppercase border border-slate-700">Batal</button>
-        <button onclick="executeDeleteAndReallocate()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase">Proses Hapus & Gabung</button>
+        <button onclick="executeDeleteAndReallocate()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase">Proses</button>
       </div>
     </div>
   </div>
@@ -231,7 +189,7 @@
         </div>
         <div>
           <div class="flex justify-between items-center mb-1">
-            <label class="block text-[10px] font-bold uppercase tracking-wider text-secondary-theme">Jumlah Nominal Transaksi</label>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-secondary-theme">Jumlah Nominal</label>
             <span id="editTxAmountFormatted" class="text-[9px] font-bold font-monospace text-blue-400">Rp 0</span>
           </div>
           <div class="relative">
@@ -246,7 +204,7 @@
       </div>
       <div class="grid grid-cols-2 gap-3 mt-6">
         <button onclick="closeEditTransactionModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl font-bold text-xs uppercase border border-slate-700">Batal</button>
-        <button onclick="saveEditTransaction()" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase">Simpan Perubahan</button>
+        <button onclick="saveEditTransaction()" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase">Simpan</button>
       </div>
     </div>
   </div>
@@ -267,7 +225,7 @@
         </div>
 
         <h3 id="authTitle" class="text-xs font-bold mb-4 text-slate-300 border-b border-slate-800 pb-2 flex items-center gap-2 uppercase tracking-wider">
-          <i class="fa-solid fa-shield-halved text-blue-500"></i> Masuk Saku Keluarga
+          <i class="fa-solid fa-shield-halved text-blue-500"></i> Masuk
         </h3>
         
         <div class="space-y-4 mb-6">
@@ -275,7 +233,7 @@
             <label class="block text-slate-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider">Email</label>
             <div class="relative">
               <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500"><i class="fa-solid fa-envelope"></i></span>
-              <input type="email" id="email" class="w-full pl-10 pr-4 py-2.5 rounded-xl premium-input font-monospace text-xs" placeholder="saya@gmail.com" required>
+              <input type="email" id="email" class="w-full pl-10 pr-4 py-2.5 rounded-xl premium-input font-monospace text-xs" required>
             </div>
           </div>
 
@@ -283,8 +241,8 @@
             <label class="block text-slate-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider">Kata Sandi</label>
             <div class="relative">
               <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500"><i class="fa-solid fa-lock"></i></span>
-              <input type="password" id="password" class="w-full pl-10 pr-10 py-2.5 rounded-xl premium-input font-monospace text-xs" placeholder="••••••••">
-              <button type="button" onclick="togglePasswordVisibility('password', 'passwordToggleIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300">
+              <input type="password" id="password" class="w-full pl-10 pr-10 py-2.5 rounded-xl premium-input font-monospace text-xs">
+              <button type="button" onclick="togglePasswordVisibility('password', 'passwordToggleIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500">
                 <i id="passwordToggleIcon" class="fa-solid fa-eye"></i>
               </button>
             </div>
@@ -292,18 +250,18 @@
 
           <div id="resetFieldsGroup" class="hidden space-y-4">
             <div class="border-t border-slate-800/60 pt-3">
-              <label class="block text-amber-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider">Kode OTP 6-Digit (Cek Email)</label>
+              <label class="block text-amber-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider">Kode OTP</label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-amber-500"><i class="fa-solid fa-key"></i></span>
-                <input type="text" id="resetOTP" class="w-full pl-10 pr-4 py-2.5 rounded-xl premium-input font-monospace text-xs tracking-widest text-center text-amber-400 font-bold" placeholder="000000" maxlength="6">
+                <input type="text" id="resetOTP" class="w-full pl-10 pr-4 py-2.5 rounded-xl premium-input font-monospace text-xs text-center text-amber-400 font-bold" maxlength="6">
               </div>
             </div>
             <div>
               <label class="block text-slate-400 text-[10px] font-bold mb-1.5 uppercase tracking-wider">Kata Sandi Baru</label>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500"><i class="fa-solid fa-lock"></i></span>
-                <input type="password" id="newPassword" class="w-full pl-10 pr-10 py-2.5 rounded-xl premium-input font-monospace text-xs" placeholder="••••••••">
-                <button type="button" onclick="togglePasswordVisibility('newPassword', 'newPasswordToggleIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-slate-300">
+                <input type="password" id="newPassword" class="w-full pl-10 pr-10 py-2.5 rounded-xl premium-input font-monospace text-xs">
+                <button type="button" onclick="togglePasswordVisibility('newPassword', 'newPasswordToggleIcon')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500">
                   <i id="newPasswordToggleIcon" class="fa-solid fa-eye"></i>
                 </button>
               </div>
@@ -312,9 +270,7 @@
         </div>
 
         <div id="authButtons" class="space-y-3">
-          <button type="submit" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider">
-            <i class="fa-solid fa-right-to-bracket mr-1.5"></i> Masuk Sekarang
-          </button>
+          <button type="submit" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider">Masuk Sekarang</button>
           <div class="flex justify-between items-center text-[10px] px-1 font-semibold text-slate-400">
             <a href="#" onclick="switchAuthState('forgot')" class="text-amber-500 hover:underline">Lupa Password?</a>
             <span>Belum punya account? <a href="#" onclick="switchAuthState('register')" class="text-blue-400 font-bold hover:underline">Daftar</a></span>
@@ -322,19 +278,13 @@
         </div>
         
         <div id="registerButtons" class="space-y-3 hidden">
-          <button type="submit" class="w-full btn-gradient-emerald text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider">
-            <i class="fa-solid fa-plus mr-1.5"></i> Buat Account
-          </button>
+          <button type="submit" class="w-full btn-gradient-emerald text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider">Buat Account</button>
           <p class="text-[10px] text-center font-semibold text-slate-400">Sudah bergabung? <a href="#" onclick="switchAuthState('login')" class="text-blue-400 font-bold hover:underline">Login SakuKeluarga</a></p>
         </div>
 
         <div id="forgotButtons" class="space-y-3 hidden">
-          <button type="button" onclick="sendPasswordResetCode()" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition">
-            <i class="fa-solid fa-paper-plane mr-1.5"></i> Kirim Kode OTP Ke Email
-          </button>
-          <button type="button" onclick="executeResetPassword()" id="btnExecuteReset" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hidden">
-            <i class="fa-solid fa-check mr-1.5"></i> Setel Ulang Kata Sandi
-          </button>
+          <button type="button" onclick="sendPasswordResetCode()" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider">Kirim Kode OTP Ke Email</button>
+          <button type="button" onclick="executeResetPassword()" id="btnExecuteReset" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hidden">Setel Ulang Kata Sandi</button>
           <p class="text-[10px] text-center font-semibold text-slate-400"><a href="#" onclick="switchAuthState('login')" class="text-slate-300 hover:underline">Kembali ke Login</a></p>
         </div>
       </form>
@@ -386,11 +336,8 @@
           </button>
         </nav>
       </div>
-
       <div class="p-3 border-t border-slate-800/40">
-        <button onclick="logout()" class="w-full bg-red-950/20 hover:bg-red-950/40 border border-red-900/40 text-red-400 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider">
-          <i class="fa-solid fa-power-off mr-1.5"></i> Keluar
-        </button>
+        <button onclick="logout()" class="w-full bg-red-950/20 hover:bg-red-950/40 border border-red-900/40 text-red-400 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider"><i class="fa-solid fa-power-off mr-1.5"></i> Keluar</button>
       </div>
     </aside>
 
@@ -398,29 +345,21 @@
     <main class="flex-grow flex flex-col min-w-0 h-full overflow-hidden">
       <header class="h-14 border-b flex items-center justify-between px-4 sm:px-6 flex-shrink-0 relative z-10">
         <div class="flex items-center space-x-3">
-          <button onclick="toggleMobileSidebar()" class="lg:hidden p-1.5 text-slate-400 hover:text-white bg-slate-800/20 border border-slate-700/10 rounded-lg">
-            <i class="fa-solid fa-bars text-sm"></i>
-          </button>
+          <button onclick="toggleMobileSidebar()" class="lg:hidden p-1.5 text-slate-400 bg-slate-800/20 border border-slate-700/10 rounded-lg"><i class="fa-solid fa-bars text-sm"></i></button>
           <h2 id="pageTitle" class="text-[10px] font-bold uppercase tracking-widest border-l-2 border-blue-500 pl-3">IKHTISAR SAKU</h2>
-          <span id="demoBadge" class="hidden px-2 py-0.5 bg-amber-500/10 text-amber-400 text-[8px] font-bold border border-amber-500/20 rounded uppercase">MODE DEMO LOKAL</span>
+          <span id="demoBadge" class="hidden px-2 py-0.5 bg-amber-500/10 text-amber-400 text-[8px] font-bold border border-amber-500/20 rounded uppercase">MODE DEMO</span>
         </div>
-        
         <div class="flex items-center space-x-4">
           <button onclick="toggleTheme()" id="themeToggleBtn" class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition text-[10px] font-bold uppercase">
             <i class="fa-solid fa-moon text-amber-400"></i> <span id="themeToggleText">MODE GELAP</span>
           </button>
-          <div class="text-[10px] flex items-center space-x-1.5 font-semibold uppercase">
-            <i class="fa-solid fa-calendar-day text-blue-400"></i> <span id="currentDate">-</span>
-          </div>
+          <div class="text-[10px] flex items-center space-x-1.5 font-semibold uppercase"><i class="fa-solid fa-calendar-day text-blue-400"></i> <span id="currentDate">-</span></div>
         </div>
       </header>
 
       <div class="flex-1 overflow-y-auto p-4 sm:p-5 relative">
         <div id="alertBox" class="hidden bg-red-950/60 border border-red-500/40 text-red-200 p-3.5 rounded-xl mb-4 flex items-center justify-between shadow-lg">
-          <div class="flex items-center space-x-2.5">
-            <div class="w-7 h-7 rounded-lg bg-red-500 text-black font-extrabold flex items-center justify-center text-xs">⚠️</div>
-            <p id="alertMsg" class="text-[10px] font-medium uppercase tracking-wide leading-relaxed"></p>
-          </div>
+          <div class="flex items-center space-x-2.5"><div class="w-7 h-7 rounded-lg bg-red-500 text-black font-extrabold flex items-center justify-center text-xs">⚠️</div><p id="alertMsg" class="text-[10px] font-medium uppercase tracking-wide leading-relaxed"></p></div>
           <button onclick="document.getElementById('alertBox').classList.add('hidden')" class="text-red-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
@@ -428,31 +367,19 @@
         <section id="tab-dashboard" class="tab-content space-y-5">
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <div class="premium-panel p-3.5 rounded-xl flex items-center justify-between">
-              <div>
-                <p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Total Saldo</p>
-                <p class="text-xs sm:text-base font-extrabold mt-0.5 font-monospace truncate" id="metricTotalBalance">Rp 0</p>
-              </div>
+              <div><p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Total Saldo</p><p class="text-xs sm:text-base font-extrabold mt-0.5 font-monospace truncate" id="metricTotalBalance">Rp 0</p></div>
               <div class="w-7 h-7 rounded-lg bg-blue-950/20 text-blue-400 border flex items-center justify-center text-xs"><i class="fa-solid fa-building-columns"></i></div>
             </div>
             <div class="premium-panel p-3.5 rounded-xl flex items-center justify-between">
-              <div>
-                <p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Pemasukan</p>
-                <p class="text-xs sm:text-base font-extrabold text-emerald-400 mt-0.5 font-monospace truncate" id="metricTotalIncome">Rp 0</p>
-              </div>
+              <div><p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Pemasukan</p><p class="text-xs sm:text-base font-extrabold text-emerald-400 mt-0.5 font-monospace truncate" id="metricTotalIncome">Rp 0</p></div>
               <div class="w-7 h-7 rounded-lg bg-emerald-950/20 text-emerald-400 border flex items-center justify-center text-xs"><i class="fa-solid fa-circle-arrow-up"></i></div>
             </div>
             <div class="premium-panel p-3.5 rounded-xl flex items-center justify-between">
-              <div>
-                <p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Pengeluaran</p>
-                <p class="text-xs sm:text-base font-extrabold text-pink-500 mt-0.5 font-monospace truncate" id="metricTotalExpense">Rp 0</p>
-              </div>
+              <div><p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Pengeluaran</p><p class="text-xs sm:text-base font-extrabold text-pink-500 mt-0.5 font-monospace truncate" id="metricTotalExpense">Rp 0</p></div>
               <div class="w-7 h-7 rounded-lg bg-pink-950/20 text-pink-500 border flex items-center justify-center text-xs"><i class="fa-solid fa-circle-arrow-down"></i></div>
             </div>
             <div class="premium-panel p-3.5 rounded-xl flex items-center justify-between">
-              <div>
-                <p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Konfigurasi</p>
-                <p class="text-xs sm:text-base font-extrabold text-amber-400 mt-0.5 font-monospace truncate" id="metricTotalPercent">0% / 100%</p>
-              </div>
+              <div><p class="text-[8px] sm:text-[9px] uppercase tracking-widest font-semibold text-secondary-theme">Konfigurasi</p><p class="text-xs sm:text-base font-extrabold text-amber-400 mt-0.5 font-monospace truncate" id="metricTotalPercent">0% / 100%</p></div>
               <div class="w-7 h-7 rounded-lg bg-amber-950/20 text-amber-400 border flex items-center justify-center text-xs"><i class="fa-solid fa-percentage"></i></div>
             </div>
           </div>
@@ -461,9 +388,7 @@
             <!-- Form Input -->
             <div class="premium-panel p-4 sm:p-5 rounded-xl flex flex-col justify-between">
               <div>
-                <div class="flex items-center justify-between border-b pb-2 mb-3">
-                  <h3 class="text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-pen-to-square mr-1.5 text-blue-500"></i>Catat Transaksi</h3>
-                </div>
+                <div class="flex items-center justify-between border-b pb-2 mb-3"><h3 class="text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-pen-to-square mr-1.5 text-blue-500"></i>Catat Transaksi</h3></div>
                 <div class="space-y-3">
                   <div>
                     <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Jenis Aliran</label>
@@ -487,7 +412,7 @@
                     </div>
                   </div>
                   <div>
-                    <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Detil / Catatan</label>
+                    <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Catatan</label>
                     <input type="text" id="txNotes" class="w-full py-1.5 px-2.5 premium-input text-[10px] font-semibold rounded-lg" placeholder="misal: Gaji bulanan">
                   </div>
                 </div>
@@ -499,28 +424,15 @@
 
             <!-- Chart -->
             <div class="premium-panel p-4 sm:p-5 rounded-xl xl:col-span-2 flex flex-col justify-between">
-              <div class="flex items-center justify-between border-b pb-2 mb-3">
-                <h3 class="text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-chart-line mr-1.5 text-pink-500"></i>Analisis Komparasi Budget vs Realisasi</h3>
-              </div>
+              <div class="flex items-center justify-between border-b pb-2 mb-3"><h3 class="text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-chart-line mr-1.5 text-pink-500"></i>Analisis Komparasi Budget vs Realisasi</h3></div>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-                <div class="relative h-44 sm:h-48 flex items-center justify-center">
-                  <canvas id="pocketDonutChart"></canvas>
-                </div>
+                <div class="relative h-44 sm:h-48 flex items-center justify-center"><canvas id="pocketDonutChart"></canvas></div>
                 <div class="space-y-3">
                   <div class="bg-black/20 p-3 border rounded-xl space-y-2">
-                    <div class="flex justify-between text-[10px]">
-                      <span class="font-semibold uppercase text-slate-400">Total Budget:</span>
-                      <span class="font-bold font-monospace text-blue-400" id="statTotalBudget">Rp 0</span>
-                    </div>
-                    <div class="flex justify-between text-[10px]">
-                      <span class="font-semibold uppercase text-slate-400">Total Actual:</span>
-                      <span class="font-bold font-monospace text-pink-500" id="statTotalActual">Rp 0</span>
-                    </div>
+                    <div class="flex justify-between text-[10px]"><span class="font-semibold uppercase text-slate-400">Total Budget:</span><span class="font-bold font-monospace text-blue-400" id="statTotalBudget">Rp 0</span></div>
+                    <div class="flex justify-between text-[10px]"><span class="font-semibold uppercase text-slate-400">Total Actual:</span><span class="font-bold font-monospace text-pink-500" id="statTotalActual">Rp 0</span></div>
                     <div class="border-t border-slate-700/50 my-1"></div>
-                    <div class="flex justify-between text-[10px]">
-                      <span class="font-semibold uppercase text-slate-400">Penyerapan:</span>
-                      <span class="font-bold font-monospace" id="statUtilRate">0%</span>
-                    </div>
+                    <div class="flex justify-between text-[10px]"><span class="font-semibold uppercase text-slate-400">Penyerapan:</span><span class="font-bold font-monospace" id="statUtilRate">0%</span></div>
                   </div>
                 </div>
               </div>
@@ -528,9 +440,7 @@
           </div>
 
           <div>
-            <div class="flex items-center justify-between border-b pb-2 mb-4">
-              <h3 class="text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-wallet mr-1.5 text-emerald-400"></i>Daftar Saku Keluarga</h3>
-            </div>
+            <div class="flex items-center justify-between border-b pb-2 mb-4"><h3 class="text-[10px] font-bold uppercase tracking-widest"><i class="fa-solid fa-wallet mr-1.5 text-emerald-400"></i>Daftar Saku Keluarga</h3></div>
             <div id="pocketList" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5"></div>
           </div>
         </section>
@@ -539,30 +449,23 @@
         <section id="tab-transactions" class="tab-content hidden space-y-5">
           <div class="premium-panel p-4 sm:p-5 rounded-xl h-full flex flex-col justify-between">
             <div class="flex flex-col xl:flex-row xl:items-center justify-between border-b pb-3 mb-4 gap-4">
-              <div>
-                <h3 class="text-[10px] font-bold uppercase tracking-widest">Buku Kas Utama</h3>
-              </div>
+              <div><h3 class="text-[10px] font-bold uppercase tracking-widest">Buku Kas Utama</h3></div>
               <div class="flex flex-wrap items-center gap-2.5">
                 <div class="flex items-center gap-1.5 border-slate-700/50">
                   <select id="exportMonth" class="premium-input text-[9px] font-bold rounded-lg py-1 px-2">
-                    <option value="all">Semua Bulan</option>
-                    <option value="0">Januari</option><option value="1">Februari</option><option value="2">Maret</option>
-                    <option value="3">April</option><option value="4">Mei</option><option value="5">Juni</option>
-                    <option value="6">Juli</option><option value="7">Agustus</option><option value="8">September</option>
-                    <option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
+                    <option value="all">Semua Bulan</option><option value="0">Januari</option><option value="1">Februari</option><option value="2">Maret</option>
+                    <option value="3">April</option><option value="4">Mei</option><option value="5">Juni</option><option value="6">Juli</option>
+                    <option value="7">Agustus</option><option value="8">September</option><option value="9">Oktober</option><option value="10">November</option><option value="11">Desember</option>
                   </select>
                   <select id="exportYear" class="premium-input text-[9px] font-bold rounded-lg py-1 px-2">
-                    <option value="all">Semua Tahun</option>
-                    <option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option>
+                    <option value="all">Semua Tahun</option><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option>
                   </select>
                   <button onclick="downloadCSVReport()" class="bg-emerald-600 text-white text-[9px] font-bold py-1 px-2.5 rounded-lg">CSV</button>
                 </div>
                 <div class="flex gap-2 w-full sm:w-auto">
                   <input type="text" id="txSearch" oninput="resetPageAndFilter()" class="premium-input text-[10px] font-semibold rounded-lg py-1.5 px-3 placeholder-slate-500" placeholder="Cari...">
                   <select id="txFilterType" onchange="resetPageAndFilter()" class="premium-input text-[10px] font-semibold rounded-lg py-1.5 px-3">
-                    <option value="Semua">Semua Aliran</option>
-                    <option value="Pemasukan">Pemasukan (+)</option>
-                    <option value="Pengeluaran">Pengeluaran (-)</option>
+                    <option value="Semua">Semua Aliran</option><option value="Pemasukan">Pemasukan (+)</option><option value="Pengeluaran">Pengeluaran (-)</option>
                   </select>
                 </div>
               </div>
@@ -573,12 +476,8 @@
                 <table class="w-full text-left border-collapse min-w-[600px] md:min-w-0">
                   <thead class="sticky top-0 z-10 bg-[#0d1424]">
                     <tr class="bg-black/40 border-b text-[9px] uppercase font-bold tracking-widest">
-                      <th class="py-2.5 px-3 border-r">Waktu</th>
-                      <th class="py-2.5 px-3 border-r">Jenis</th>
-                      <th class="py-2.5 px-3 border-r">Saku Alokasi</th>
-                      <th class="py-2.5 px-3 border-r text-right">Nominal</th>
-                      <th class="py-2.5 px-3 border-r">Catatan</th>
-                      <th class="py-2.5 px-3 text-center">Aksi</th>
+                      <th class="py-2.5 px-3 border-r">Waktu</th><th class="py-2.5 px-3 border-r">Jenis</th><th class="py-2.5 px-3 border-r">Saku Alokasi</th>
+                      <th class="py-2.5 px-3 border-r text-right">Nominal</th><th class="py-2.5 px-3 border-r">Catatan</th><th class="py-2.5 px-3 text-center">Aksi</th>
                     </tr>
                   </thead>
                   <tbody id="transactionTableBody" class="text-[10px] divide-y divide-slate-800/20"></tbody>
@@ -597,45 +496,20 @@
         <section id="tab-pockets" class="tab-content hidden space-y-5">
           <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
             <div class="premium-panel p-5 rounded-xl h-fit">
-              <div class="border-b pb-2 mb-3">
-                <h3 class="text-[10px] font-bold uppercase tracking-widest">Buat Saku Kustom</h3>
-              </div>
+              <div class="border-b pb-2 mb-3"><h3 class="text-[10px] font-bold uppercase tracking-widest">Buat Saku Kustom</h3></div>
               <div class="space-y-3">
-                <div>
-                  <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Nama Saku</label>
-                  <input type="text" id="pocketNewName" class="w-full py-1.5 px-2.5 premium-input text-[10px] font-bold rounded-lg">
-                </div>
-                <div>
-                  <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Porsi Alokasi (%)</label>
-                  <input type="number" id="pocketNewPercentage" class="w-full py-1.5 px-2.5 premium-input text-[10px] font-bold rounded-lg font-monospace">
-                </div>
+                <div><label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Nama Saku</label><input type="text" id="pocketNewName" class="w-full py-1.5 px-2.5 premium-input text-[10px] font-bold rounded-lg"></div>
+                <div><label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Porsi Alokasi (%)</label><input type="number" id="pocketNewPercentage" class="w-full py-1.5 px-2.5 premium-input text-[10px] font-bold rounded-lg font-monospace"></div>
                 <div class="grid grid-cols-2 gap-3">
-                  <div>
-                    <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Ikon</label>
-                    <select id="pocketNewIcon" class="w-full premium-input py-1.5 px-2 text-[10px] font-bold rounded-lg">
-                      <option value="fa-solid fa-house">🏠 Rumah Tangga</option>
-                      <option value="fa-solid fa-cart-shopping">🛒 Belanja</option>
-                      <option value="fa-solid fa-gamepad">🎮 Hiburan</option>
-                      <option value="fa-solid fa-piggy-bank">🐷 Tabungan</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Warna</label>
-                    <select id="pocketNewColor" class="w-full premium-input py-1.5 px-2 text-[10px] font-bold rounded-lg">
-                      <option value="#3b82f6">Ocean Blue</option>
-                      <option value="#10b981">Emerald Green</option>
-                      <option value="#ec4899">Pink Rose</option>
-                    </select>
-                  </div>
+                  <div><label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Ikon</label><select id="pocketNewIcon" class="w-full premium-input py-1.5 px-2 text-[10px] font-bold rounded-lg"><option value="fa-solid fa-house">🏠 Rumah Tangga</option><option value="fa-solid fa-cart-shopping">🛒 Belanja</option><option value="fa-solid fa-gamepad">🎮 Hiburan</option><option value="fa-solid fa-piggy-bank">🐷 Tabungan</option></select></div>
+                  <div><label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Warna</label><select id="pocketNewColor" class="w-full premium-input py-1.5 px-2 text-[10px] font-bold rounded-lg"><option value="#3b82f6">Ocean Blue</option><option value="#10b981">Emerald Green</option><option value="#ec4899">Pink Rose</option></select></div>
                 </div>
                 <button onclick="createCustomPocket()" class="w-full btn-gradient-emerald text-white py-2 font-bold uppercase text-[10px] rounded-lg">Simpan Saku</button>
               </div>
             </div>
 
             <div class="premium-panel p-5 rounded-xl xl:col-span-2">
-              <div class="border-b pb-2 mb-4">
-                <h3 class="text-[10px] font-bold uppercase tracking-widest">Struktur Distribusi Saku Aktif</h3>
-              </div>
+              <div class="border-b pb-2 mb-4"><h3 class="text-[10px] font-bold uppercase tracking-widest">Struktur Distribusi Saku Aktif</h3></div>
               <div class="space-y-2.5 max-h-[350px] overflow-y-auto" id="pocketConfigList"></div>
             </div>
           </div>
@@ -644,29 +518,15 @@
         <!-- TAB: TRANSFER -->
         <section id="tab-transfer" class="tab-content hidden space-y-5">
           <div class="premium-panel p-6 max-w-lg mx-auto rounded-xl">
-            <div class="border-b pb-2 mb-4 text-center">
-              <h3 class="text-[10px] font-bold uppercase tracking-widest">Pindah Saldo Antar Saku</h3>
-            </div>
+            <div class="border-b pb-2 mb-4 text-center"><h3 class="text-[10px] font-bold uppercase tracking-widest">Pindah Saldo Antar Saku</h3></div>
             <div class="space-y-4">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div>
-                  <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Saku Pengirim</label>
-                  <select id="transferSource" class="w-full premium-input py-1.5 px-2.5 text-[10px] font-bold rounded-lg"></select>
-                </div>
-                <div>
-                  <label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Saku Penerima</label>
-                  <select id="transferTarget" class="w-full premium-input py-1.5 px-2.5 text-[10px] font-bold rounded-lg"></select>
-                </div>
+                <div><label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Saku Pengirim</label><select id="transferSource" class="w-full premium-input py-1.5 px-2.5 text-[10px] font-bold rounded-lg"></select></div>
+                <div><label class="block text-[8px] font-bold uppercase tracking-wider mb-1">Saku Penerima</label><select id="transferTarget" class="w-full premium-input py-1.5 px-2.5 text-[10px] font-bold rounded-lg"></select></div>
               </div>
               <div>
-                <div class="flex justify-between items-center mb-1">
-                  <label class="block text-[8px] font-bold uppercase tracking-wider">Nominal Transfer (Rp)</label>
-                  <span id="transferAmountFormatted" class="text-[9px] font-bold font-monospace text-blue-400">Rp 0</span>
-                </div>
-                <div class="relative">
-                  <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-blue-400 text-[10px] font-bold font-monospace">Rp</span>
-                  <input type="number" id="transferAmount" oninput="liveFormatCurrency('transferAmount', 'transferAmountFormatted')" class="w-full pl-8 pr-2.5 py-1.5 premium-input text-[10px] font-bold rounded-lg font-monospace">
-                </div>
+                <div class="flex justify-between items-center mb-1"><label class="block text-[8px] font-bold uppercase tracking-wider">Nominal Transfer (Rp)</label><span id="transferAmountFormatted" class="text-[9px] font-bold font-monospace text-blue-400">Rp 0</span></div>
+                <div class="relative"><span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-blue-400 text-[10px] font-bold font-monospace">Rp</span><input type="number" id="transferAmount" oninput="liveFormatCurrency('transferAmount', 'transferAmountFormatted')" class="w-full pl-8 pr-2.5 py-1.5 premium-input text-[10px] font-bold rounded-lg font-monospace"></div>
               </div>
               <button onclick="handleTransfer()" class="w-full btn-gradient-blue text-white py-2 font-bold uppercase text-[10px] rounded-lg">Eksekusi Transfer</button>
             </div>
@@ -678,7 +538,7 @@
 
   <script>
     // =========================================================================
-    // PASTE URL WEB APP HASIL DEPLOY GOOGLE APPS SCRIPT ANDA DI BAWAH INI:
+    // 1. PASTE URL WEB APP HASIL DEPLOY GOOGLE APPS SCRIPT ANDA DI BAWAH INI:
     // =========================================================================
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwmb3D13MyZC_0QB7pUXAi4AMOSjXXLjx5Govhh71IPhNr_0sDABZ5AGE9ri_rOrUNb/exec"; 
 
@@ -688,20 +548,13 @@
     const MOCK_USERS_KEY = "JAGOFAMILY_MOCK_USERS_V5";
 
     let session = { sheetId: "", email: "" };
-    let globalPockets = [];
-    let globalTransactions = [];
-    let donutChartInstance = null;
-    let isMockMode = false;
-    let currentAuthState = 'login';
-    const sessionTimeout = 15 * 60 * 1000;
-    let currentPage = 1;
-    const rowsPerPage = 10;
-    let currentConfirmCallback = null;
+    let globalPockets = []; let globalTransactions = [];
+    let donutChartInstance = null; let isMockMode = false;
+    let currentAuthState = 'login'; const sessionTimeout = 15 * 60 * 1000;
+    let currentPage = 1; const rowsPerPage = 10; let currentConfirmCallback = null;
 
-    // DETEKSI OTOMATIS MODE DEMO ATAU PRODUCTION ONLINE
-    if (GAS_WEB_APP_URL === "" || GAS_WEB_APP_URL === "URL_DEPLOYN_GAS_ANDA") {
-      isMockMode = true;
-      document.getElementById('demoBadge').classList.remove('hidden');
+    if (GAS_WEB_APP_URL === "" || GAS_WEB_APP_URL === "TARUH_URL_WEB_APP_ANDA_DISINI") {
+      isMockMode = true; document.getElementById('demoBadge').classList.remove('hidden');
     }
 
     // BRIDGE API UTAMA MENGGANTIKAN google.script.run
@@ -709,10 +562,9 @@
       if (isMockMode) return null;
       try {
         const response = await fetch(GAS_WEB_APP_URL, {
-          method: "POST",
-          mode: "cors",
+          method: "POST", mode: "cors",
           body: JSON.stringify({ action: actionName, payload: payloadData }),
-          headers: { "Content-Type": "text/plain;charset=utf-8" }
+          headers: { "Content-Type": "text/plain;charset=utf-8" } // JANGAN UBAH INI
         });
         return await response.json();
       } catch (err) {
@@ -725,8 +577,7 @@
     function formatRupiah(amount) { return "Rp " + parseFloat(amount).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
     
     function formatDateTimeConsistent(dateInput) {
-      const date = new Date(dateInput);
-      if (isNaN(date.getTime())) return "-";
+      const date = new Date(dateInput); if (isNaN(date.getTime())) return "-";
       const day = String(date.getDate()).padStart(2, '0');
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
       return `${day} ${months[date.getMonth()]} ${date.getFullYear()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`;
@@ -745,8 +596,7 @@
       const iconBg = document.getElementById('customAlertIconBg');
       const icon = document.getElementById('customAlertIcon');
       titleEl.innerText = title; msgEl.innerText = message;
-      iconBg.className = "w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl border";
-      icon.className = "fa-solid";
+      iconBg.className = "w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl border"; icon.className = "fa-solid";
       if (type === 'error') { iconBg.classList.add('bg-red-500/10', 'text-red-500', 'border-red-500/20'); icon.classList.add('fa-circle-xmark'); }
       else if (type === 'success') { iconBg.classList.add('bg-emerald-500/10', 'text-emerald-500', 'border-emerald-500/20'); icon.classList.add('fa-circle-check'); }
       else if (type === 'warning') { iconBg.classList.add('bg-amber-500/10', 'text-amber-500', 'border-amber-500/20'); icon.classList.add('fa-triangle-exclamation'); }
@@ -758,8 +608,7 @@
     function showCustomConfirm(title, message, onConfirmCallback) {
       document.getElementById('customConfirmTitle').innerText = title;
       document.getElementById('customConfirmMessage').innerText = message;
-      currentConfirmCallback = onConfirmCallback;
-      document.getElementById('customConfirmModal').classList.remove('hidden');
+      currentConfirmCallback = onConfirmCallback; document.getElementById('customConfirmModal').classList.remove('hidden');
     }
     function closeCustomConfirm(isConfirmed) {
       document.getElementById('customConfirmModal').classList.add('hidden');
@@ -769,12 +618,9 @@
 
     function openEditPocketModal(pocketName) {
       let p = globalPockets.find(item => item.name === pocketName); if (!p) return;
-      document.getElementById('editPocketOldName').value = p.name;
-      document.getElementById('editPocketName').value = p.name;
-      document.getElementById('editPocketPercentage').value = p.percentage;
-      document.getElementById('editPocketIcon').value = p.icon;
-      document.getElementById('editPocketColor').value = p.color;
-      document.getElementById('editPocketModal').classList.remove('hidden');
+      document.getElementById('editPocketOldName').value = p.name; document.getElementById('editPocketName').value = p.name;
+      document.getElementById('editPocketPercentage').value = p.percentage; document.getElementById('editPocketIcon').value = p.icon;
+      document.getElementById('editPocketColor').value = p.color; document.getElementById('editPocketModal').classList.remove('hidden');
     }
     function closeEditPocketModal() { document.getElementById('editPocketModal').classList.add('hidden'); }
 
@@ -782,22 +628,18 @@
       let oldName = document.getElementById('editPocketOldName').value;
       let newName = document.getElementById('editPocketName').value.trim();
       let percentage = parseFloat(document.getElementById('editPocketPercentage').value) || 0;
-      let icon = document.getElementById('editPocketIcon').value;
-      let color = document.getElementById('editPocketColor').value;
+      let icon = document.getElementById('editPocketIcon').value; let color = document.getElementById('editPocketColor').value;
 
       if (!newName || percentage <= 0) { showCustomAlert("Data Salah", "Isi parameter saku secara lengkap!", "error"); return; }
       let otherTotal = globalPockets.filter(p => p.name !== oldName).reduce((sum, p) => sum + p.percentage, 0);
       if (otherTotal + percentage > 100) { showCustomAlert("Gagal", `Alokasi melebihi batas 100% (Sisa kuota: ${100 - otherTotal}%).`, "error"); return; }
 
       if (isMockMode) {
-        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY));
-        let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
+        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)); let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
         pockets.forEach(p => { if (p.name === oldName) { p.name = newName; p.percentage = percentage; p.icon = icon; p.color = color; } });
         if (oldName !== newName) transactions.forEach(t => { if (t.pocket === oldName) t.pocket = newName; });
-        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets));
-        localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
-        closeEditPocketModal(); loadAllSystemData();
-        showCustomAlert("Sukses", "Perubahan saku lokal disimpan.", "success");
+        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+        closeEditPocketModal(); loadAllSystemData(); showCustomAlert("Sukses", "Perubahan saku lokal disimpan.", "success");
       } else {
         let res = await executeCloudApi('updatePocket', { sheetId: session.sheetId, oldName, newName, percentage, color, icon });
         if (res && res.success) { closeEditPocketModal(); loadAllSystemData(); showCustomAlert("Sukses", "Saku tersinkronisasi ke cloud.", "success"); }
@@ -811,8 +653,7 @@
       let targetDropdown = document.getElementById('deletePocketTarget'); targetDropdown.innerHTML = "";
       globalPockets.forEach(p => {
         if (p.name !== pocketName) {
-          let opt = document.createElement('option'); opt.value = p.name;
-          opt.innerText = `${p.name} (Saldo: ${formatRupiah(p.remaining)})`; targetDropdown.appendChild(opt);
+          let opt = document.createElement('option'); opt.value = p.name; opt.innerText = `${p.name} (Saldo: ${formatRupiah(p.remaining)})`; targetDropdown.appendChild(opt);
         }
       });
       document.getElementById('deletePocketModal').classList.remove('hidden');
@@ -825,20 +666,14 @@
       let redistributeMode = document.getElementById('deletePocketRedistribute').value;
 
       if (isMockMode) {
-        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY));
-        let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
-        let delItem = pockets.find(p => p.name === pocketToDelete);
-        let tgtItem = pockets.find(p => p.name === targetPocket);
+        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)); let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
+        let delItem = pockets.find(p => p.name === pocketToDelete); let tgtItem = pockets.find(p => p.name === targetPocket);
         tgtItem.allocated += delItem.allocated; tgtItem.spent += delItem.spent;
         if (redistributeMode === "target") tgtItem.percentage += delItem.percentage;
-        else {
-          let share = delItem.percentage / (pockets.length - 1);
-          pockets.forEach(p => { if (p.name !== pocketToDelete) p.percentage += share; });
-        }
+        else { let share = delItem.percentage / (pockets.length - 1); pockets.forEach(p => { if (p.name !== pocketToDelete) p.percentage += share; }); }
         transactions.forEach(t => { if (t.pocket === pocketToDelete) t.pocket = targetPocket; });
         pockets = pockets.filter(p => p.name !== pocketToDelete);
-        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets));
-        localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
         closeDeletePocketModal(); loadAllSystemData(); showCustomAlert("Sukses", "Saku lokal dilebur.", "success");
       } else {
         let res = await executeCloudApi('deleteAndReallocatePocket', { sheetId: session.sheetId, pocketToDelete, targetPocket, redistributeMode });
@@ -853,17 +688,12 @@
 
     function openEditTransactionModal(txIndex) {
       let t = globalTransactions.find(item => item.index === txIndex); if (!t) return;
-      document.getElementById('editTxIndex').value = txIndex;
-      document.getElementById('editTxType').value = t.type;
+      document.getElementById('editTxIndex').value = txIndex; document.getElementById('editTxType').value = t.type;
       let editTxPocket = document.getElementById('editTxPocket'); editTxPocket.innerHTML = "";
-      globalPockets.forEach(p => {
-        let opt = document.createElement('option'); opt.value = p.name; opt.innerText = p.name; editTxPocket.appendChild(opt);
-      });
+      globalPockets.forEach(p => { let opt = document.createElement('option'); opt.value = p.name; opt.innerText = p.name; editTxPocket.appendChild(opt); });
       if (t.type === "Pengeluaran") document.getElementById('editTxPocket').value = t.pocket;
-      document.getElementById('editTxAmount').value = t.amount;
-      document.getElementById('editTxNotes').value = t.notes;
-      liveFormatCurrencyRaw('editTxAmount', 'editTxAmountFormatted');
-      checkEditTxType();
+      document.getElementById('editTxAmount').value = t.amount; document.getElementById('editTxNotes').value = t.notes;
+      liveFormatCurrencyRaw('editTxAmount', 'editTxAmountFormatted'); checkEditTxType();
       document.getElementById('editTransactionModal').classList.remove('hidden');
     }
     function closeEditTransactionModal() { document.getElementById('editTransactionModal').classList.add('hidden'); }
@@ -877,8 +707,7 @@
       if (amount <= 0) { showCustomAlert("Input Error", "Masukkan nominal secara benar!", "error"); return; }
 
       if (isMockMode) {
-        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)) || [];
-        let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY)) || [];
+        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)) || []; let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY)) || [];
         let tx = transactions.find(t => t.index === txIndex);
         if (tx.type === "Pemasukan") pockets.forEach(p => { p.allocated = Math.max(0, p.allocated - (tx.amount * (p.percentage / 100))); });
         else pockets.forEach(p => { if (p.name === tx.pocket) p.spent = Math.max(0, p.spent - tx.amount); });
@@ -887,8 +716,7 @@
         if (type === "Pemasukan") pockets.forEach(p => { p.allocated += amount * (p.percentage / 100); p.remaining = p.allocated - p.spent; });
         else pockets.forEach(p => { if (p.name === pocket) { p.spent += amount; p.remaining = p.allocated - p.spent; } });
         
-        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets));
-        localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
         closeEditTransactionModal(); loadAllSystemData(); showCustomAlert("Sukses", "Kas lokal direkonsiliasi.", "success");
       } else {
         let res = await executeCloudApi('updateTransaction', { sheetId: session.sheetId, txIndex, type, pocketName: pocket, amount, notes });
@@ -897,8 +725,7 @@
     }
 
     function downloadCSVReport() {
-      let monthFilter = document.getElementById('exportMonth').value;
-      let yearFilter = document.getElementById('exportYear').value;
+      let monthFilter = document.getElementById('exportMonth').value; let yearFilter = document.getElementById('exportYear').value;
       let filtered = globalTransactions.filter(t => {
         let d = new Date(t.date); if (isNaN(d.getTime())) return false;
         return (monthFilter === "all" || d.getMonth().toString() === monthFilter) && (yearFilter === "all" || d.getFullYear().toString() === yearFilter);
@@ -906,21 +733,15 @@
       if (filtered.length === 0) { showCustomAlert("Gagal", "Tidak ada data riwayat yang cocok.", "warning"); return; }
       let csvContent = "\uFEFFDate,Type,Pocket,Amount,Notes\n";
       filtered.forEach(t => { csvContent += `"${formatDateTimeConsistent(t.date)}","${t.type}","${t.pocket}",${t.amount},"${t.notes.replace(/"/g, '""')}"\n`; });
-      let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      let url = URL.createObjectURL(blob);
-      let link = document.createElement("a"); link.setAttribute("href", url);
-      link.setAttribute("download", `Laporan_Kas_${yearFilter}.csv`);
+      let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); let url = URL.createObjectURL(blob);
+      let link = document.createElement("a"); link.setAttribute("href", url); link.setAttribute("download", `Laporan_Kas_${yearFilter}.csv`);
       document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
-    function toggleMobileSidebar() {
-      document.getElementById('sidebar').classList.toggle('-translate-x-full');
-      document.getElementById('sidebarOverlay').classList.toggle('hidden');
-    }
+    function toggleMobileSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebarOverlay').classList.toggle('hidden'); }
 
     function saveSession(sheetId, email) {
-      localStorage.setItem('S_ID', sheetId); localStorage.setItem('S_EM', email);
-      localStorage.setItem('S_EX', (Date.now() + sessionTimeout).toString());
+      localStorage.setItem('S_ID', sheetId); localStorage.setItem('S_EM', email); localStorage.setItem('S_EX', (Date.now() + sessionTimeout).toString());
     }
     function clearSession() { localStorage.removeItem('S_ID'); localStorage.removeItem('S_EM'); localStorage.removeItem('S_EX'); }
     function restoreSession() {
@@ -930,8 +751,7 @@
 
     async function hashPassword(password) {
       try {
-        const msgBuffer = new TextEncoder().encode(password);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const msgBuffer = new TextEncoder().encode(password); const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
         return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
       } catch (e) { return "fb_" + password.length; }
     }
@@ -942,14 +762,10 @@
       else { input.type = 'password'; icon.className = 'fa-solid fa-eye'; }
     }
 
-    function toggleTheme() {
-      let isL = document.body.classList.toggle('light-theme');
-      localStorage.setItem('THEME', isL ? 'light' : 'dark'); updateThemeUI(isL);
-    }
+    function toggleTheme() { let isL = document.body.classList.toggle('light-theme'); localStorage.setItem('THEME', isL ? 'light' : 'dark'); updateThemeUI(isL); }
     function initTheme() {
       let isL = localStorage.getItem('THEME') === 'light';
-      if (isL) document.body.classList.add('light-theme'); else document.body.classList.remove('light-theme');
-      updateThemeUI(isL);
+      if (isL) document.body.classList.add('light-theme'); else document.body.classList.remove('light-theme'); updateThemeUI(isL);
     }
     function updateThemeUI(isL) {
       let btn = document.getElementById('themeToggleBtn'); if (!btn) return;
@@ -965,38 +781,28 @@
         ]));
       }
       if (!localStorage.getItem(MOCK_TRANSACTIONS_KEY)) {
-        localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify([
-          { index: 1, date: new Date().toISOString(), type: "Pemasukan", pocket: "Semua", amount: 10000000, notes: "Gaji Pokok Awal" }
-        ]));
+        localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify([{ index: 1, date: new Date().toISOString(), type: "Pemasukan", pocket: "Semua", amount: 10000000, notes: "Gaji Pokok Awal" }]));
       }
-      if (!localStorage.getItem(MOCK_USERS_KEY)) {
-        localStorage.setItem(MOCK_USERS_KEY, JSON.stringify([{ email: "demo@keluarga.com", password: "demo123", sheetId: "MOCK_ID" }]));
-      }
+      if (!localStorage.getItem(MOCK_USERS_KEY)) { localStorage.setItem(MOCK_USERS_KEY, JSON.stringify([{ email: "demo@keluarga.com", password: "demo123", sheetId: "MOCK_ID" }])); }
     }
 
     function setupUIOnLogin() {
-      document.getElementById('userDisplay').innerText = session.email;
-      document.getElementById('userInitial').innerText = session.email.charAt(0).toUpperCase();
-      document.getElementById('authContainer').classList.add('hidden');
-      document.getElementById('dashboardContainer').classList.remove('hidden');
-      loadAllSystemData();
+      document.getElementById('userDisplay').innerText = session.email; document.getElementById('userInitial').innerText = session.email.charAt(0).toUpperCase();
+      document.getElementById('authContainer').classList.add('hidden'); document.getElementById('dashboardContainer').classList.remove('hidden'); loadAllSystemData();
     }
 
     async function loadAllSystemData() {
       if (isMockMode) {
         renderSystemState({ success: true, pockets: JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)), transactions: JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY)) });
       } else {
-        let res = await executeCloudApi('getDashboardData', { sheetId: session.sheetId });
-        if (res) renderSystemState(res);
+        let res = await executeCloudApi('getDashboardData', { sheetId: session.sheetId }); if (res) renderSystemState(res);
       }
     }
 
     function logout() { clearSession(); location.reload(); }
 
     function handleTransfer() {
-      let source = document.getElementById('transferSource').value;
-      let target = document.getElementById('transferTarget').value;
-      let amount = parseFloat(document.getElementById('transferAmount').value) || 0;
+      let source = document.getElementById('transferSource').value; let target = document.getElementById('transferTarget').value; let amount = parseFloat(document.getElementById('transferAmount').value) || 0;
       if (source === target || amount <= 0) { showCustomAlert("Gagal", "Validasi pemindahan dana tidak sesuai.", "error"); return; }
       executeTransfer(source, target, amount);
     }
@@ -1005,8 +811,7 @@
       if (isMockMode) {
         let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY));
         pockets.forEach(p => { if (p.name === source) p.allocated -= amount; if (p.name === target) p.allocated += amount; p.remaining = p.allocated - p.spent; });
-        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets));
-        showCustomAlert("Sukses", "Dana teralihkan.", "success"); loadAllSystemData();
+        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); showCustomAlert("Sukses", "Dana teralihkan.", "success"); loadAllSystemData();
       } else {
         let res = await executeCloudApi('transferPocketFunds', { sheetId: session.sheetId, source, target, amount });
         if (res && res.success) { showCustomAlert("Sukses", "Transfer eksekusi cloud sukses.", "success"); loadAllSystemData(); }
@@ -1014,17 +819,14 @@
     }
 
     async function createCustomPocket() {
-      let name = document.getElementById('pocketNewName').value.trim();
-      let percentage = parseFloat(document.getElementById('pocketNewPercentage').value) || 0;
-      let icon = document.getElementById('pocketNewIcon').value;
-      let color = document.getElementById('pocketNewColor').value;
+      let name = document.getElementById('pocketNewName').value.trim(); let percentage = parseFloat(document.getElementById('pocketNewPercentage').value) || 0;
+      let icon = document.getElementById('pocketNewIcon').value; let color = document.getElementById('pocketNewColor').value;
       if (!name || percentage <= 0) return;
 
       if (isMockMode) {
         let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)) || [];
         pockets.push({ name, percentage, allocated: 0, spent: 0, remaining: 0, color, icon });
-        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets));
-        loadAllSystemData(); showCustomAlert("Sukses", "Saku baru dibuat.", "success");
+        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); loadAllSystemData(); showCustomAlert("Sukses", "Saku baru dibuat.", "success");
       } else {
         let res = await executeCloudApi('addCustomPocket', { sheetId: session.sheetId, name, percentage, color, icon });
         if (res && res.success) { loadAllSystemData(); showCustomAlert("Sukses", "Saku cloud bertambah.", "success"); }
@@ -1034,29 +836,24 @@
     function resetPageAndFilter() { currentPage = 1; filterTransactions(); }
 
     function filterTransactions() {
-      let query = document.getElementById('txSearch').value.toLowerCase();
-      let typeFilter = document.getElementById('txFilterType').value;
+      let query = document.getElementById('txSearch').value.toLowerCase(); let typeFilter = document.getElementById('txFilterType').value;
       let tbody = document.getElementById('transactionTableBody'); if (!tbody) return; tbody.innerHTML = "";
-
       let filtered = globalTransactions.filter(t => (t.notes.toLowerCase().includes(query) || t.pocket.toLowerCase().includes(query)) && (typeFilter === "Semua" || t.type === typeFilter));
-      let totalPages = Math.ceil(filtered.length / rowsPerPage);
-      renderPaginationControls(totalPages);
+      let totalPages = Math.ceil(filtered.length / rowsPerPage); renderPaginationControls(totalPages);
 
-      if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Tidak ada riwayat</td></tr>`; return;
-      }
+      if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Tidak ada riwayat</td></tr>`; return; }
       let paginated = filtered.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
       paginated.forEach(t => {
         tbody.innerHTML += `
           <tr class="hover:bg-slate-500/5">
-            <td class="py-2 px-3 font-monospace">${formatDateTimeConsistent(t.date)}</td>
-            <td class="py-2 px-3">${t.type === "Pemasukan" ? "📈 MASUK" : "📉 KELUAR"}</td>
-            <td class="py-2 px-3 font-bold text-slate-400">${t.pocket}</td>
-            <td class="py-2 px-3 text-right font-bold">${formatRupiah(t.amount)}</td>
-            <td class="py-2 px-3">${t.notes}</td>
+            <td class="py-2 px-3 font-monospace border-r border-slate-500/10">${formatDateTimeConsistent(t.date)}</td>
+            <td class="py-2 px-3 border-r border-slate-500/10">${t.type === "Pemasukan" ? "📈 MASUK" : "📉 KELUAR"}</td>
+            <td class="py-2 px-3 font-bold text-slate-400 border-r border-slate-500/10">${t.pocket}</td>
+            <td class="py-2 px-3 text-right font-bold border-r border-slate-500/10 ${t.type === "Pemasukan" ? "text-emerald-400" : "text-pink-500"}">${formatRupiah(t.amount)}</td>
+            <td class="py-2 px-3 border-r border-slate-500/10 truncate max-w-xs">${t.notes}</td>
             <td class="py-2 px-3 text-center">
-              <button onclick="openEditTransactionModal(${t.index})" class="text-blue-500 mx-1"><i class="fa-solid fa-edit"></i></button>
-              <button onclick="handleDeleteTransaction(${t.index})" class="text-red-500 mx-1"><i class="fa-solid fa-trash"></i></button>
+              <button onclick="openEditTransactionModal(${t.index})" class="text-blue-500 mx-1 p-1 hover:border-blue-500 border border-transparent rounded"><i class="fa-solid fa-edit"></i></button>
+              <button onclick="handleDeleteTransaction(${t.index})" class="text-red-500 mx-1 p-1 hover:border-red-500 border border-transparent rounded"><i class="fa-solid fa-trash"></i></button>
             </td>
           </tr>`;
       });
@@ -1065,7 +862,7 @@
     function renderPaginationControls(totalPages) {
       let container = document.getElementById('transactionPagination'); if (!container) return; container.innerHTML = "";
       for (let i = 1; i <= totalPages; i++) {
-        let btn = document.createElement('button'); btn.className = `px-2 py-1 mx-0.5 rounded border ${currentPage === i ? 'bg-blue-600 text-white' : ''}`;
+        let btn = document.createElement('button'); btn.className = `px-2 py-1 mx-0.5 rounded border border-slate-800 ${currentPage === i ? 'bg-blue-600 text-white' : 'hover:border-blue-500'}`;
         btn.innerText = i; btn.onclick = () => { currentPage = i; filterTransactions(); }; container.appendChild(btn);
       }
     }
@@ -1074,25 +871,71 @@
       if (!res || !res.success) return;
       globalPockets = res.pockets || []; globalTransactions = res.transactions || [];
       let pocketList = document.getElementById('pocketList'); pocketList.innerHTML = "";
-      
+      let configList = document.getElementById('pocketConfigList'); configList.innerHTML = "";
       let totalBalance = 0;
+
+      // Update Form Dropdowns
+      let txPocket = document.getElementById('txPocket'); txPocket.innerHTML = "";
+      let tSrc = document.getElementById('transferSource'); tSrc.innerHTML = "";
+      let tTgt = document.getElementById('transferTarget'); tTgt.innerHTML = "";
+      
       globalPockets.forEach(p => {
         totalBalance += (p.allocated - p.spent);
         let pctUsed = p.allocated > 0 ? (p.spent / p.allocated) * 100 : 0;
         let isInvest = isInvestmentPocket(p.name);
         let barColor = isInvest ? '#10b981' : (p.spent > p.allocated ? '#ef4444' : p.color);
 
+        // Populate Dropdowns
+        txPocket.innerHTML += `<option value="${p.name}">${p.name} (Sisa: ${formatRupiah(p.remaining)})</option>`;
+        tSrc.innerHTML += `<option value="${p.name}">${p.name} (Sisa: ${formatRupiah(p.remaining)})</option>`;
+        tTgt.innerHTML += `<option value="${p.name}">${p.name}</option>`;
+
         pocketList.innerHTML += `
-          <div class="premium-panel p-4 relative overflow-hidden rounded-xl">
+          <div class="premium-panel p-4 relative overflow-hidden rounded-xl border">
             <div class="absolute top-0 left-0 w-1.5 h-full" style="background-color: ${p.color}"></div>
-            <h4 class="font-bold text-xs truncate text-primary-theme">${p.name}</h4>
-            <p class="text-sm font-bold font-monospace">${formatRupiah(isInvest ? p.spent : p.remaining)}</p>
-            <div class="w-full bg-slate-500/10 h-1.5 rounded-full overflow-hidden mt-2">
+            <div class="flex justify-between items-start mb-2 pl-2">
+              <div class="w-8 h-8 flex items-center justify-center rounded-lg" style="background-color: ${p.color}20; color: ${p.color}"><i class="${p.icon || 'fa-solid fa-wallet'}"></i></div>
+              <span class="text-[8px] uppercase font-bold tracking-widest px-1.5 py-0.5 rounded-lg border" style="background-color: ${p.color}15; color: ${p.color}; border-color: ${p.color}40">Porsi: ${p.percentage}%</span>
+            </div>
+            <h4 class="font-bold text-xs pl-2 truncate text-primary-theme">${p.name}</h4>
+            <div class="flex justify-between items-baseline mb-2 pl-2">
+              <p class="text-[8px] text-slate-500 uppercase font-semibold">${isInvest ? 'Terkumpul' : 'Sisa'}</p>
+              <p class="text-sm font-bold font-monospace ${isInvest ? 'text-emerald-400' : (p.spent > p.allocated ? 'text-red-500' : '')}">${formatRupiah(isInvest ? p.spent : p.remaining)}</p>
+            </div>
+            <div class="w-full bg-slate-500/10 h-1.5 rounded-full overflow-hidden ml-2">
               <div class="h-full transition-all duration-500" style="width: ${Math.min(pctUsed, 100)}%; background-color: ${barColor}"></div>
             </div>
           </div>`;
+
+        configList.innerHTML += `
+          <div class="bg-black/10 p-3.5 border rounded-xl flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background-color: ${p.color}15; color: ${p.color}"><i class="${p.icon || 'fa-solid fa-wallet'} text-xs"></i></div>
+              <span class="font-bold text-xs uppercase text-primary-theme">${p.name}</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="text-[9px] text-blue-400 font-bold bg-blue-950/20 border border-blue-500/20 px-2.5 py-0.5 rounded-lg">${p.percentage}%</span>
+              <button onclick="openEditPocketModal('${p.name}')" class="text-blue-500 p-1.5"><i class="fa-solid fa-pen text-xs"></i></button>
+              <button onclick="openDeletePocketModal('${p.name}')" class="text-red-500 p-1.5"><i class="fa-solid fa-trash-can text-xs"></i></button>
+            </div>
+          </div>`;
       });
+
       document.getElementById('metricTotalBalance').innerText = formatRupiah(totalBalance);
+      let totalAllocatedSum = globalPockets.reduce((sum, p) => sum + p.allocated, 0);
+      let totalSpentSum = globalPockets.reduce((sum, p) => sum + p.spent, 0);
+      document.getElementById('statTotalBudget').innerText = formatRupiah(totalAllocatedSum);
+      document.getElementById('statTotalActual').innerText = formatRupiah(totalSpentSum);
+      document.getElementById('statUtilRate').innerText = (totalAllocatedSum > 0 ? (totalSpentSum / totalAllocatedSum) * 100 : 0).toFixed(1) + "%";
+
+      let totalPercent = globalPockets.reduce((sum, p) => sum + p.percentage, 0);
+      document.getElementById('metricTotalPercent').innerText = `${totalPercent}% / 100%`;
+
+      let tIn = globalTransactions.filter(t => t.type === "Pemasukan").reduce((sum, t) => sum + t.amount, 0);
+      let tOut = globalTransactions.filter(t => t.type === "Pengeluaran").reduce((sum, t) => sum + t.amount, 0);
+      document.getElementById('metricTotalIncome').innerText = formatRupiah(tIn);
+      document.getElementById('metricTotalExpense').innerText = formatRupiah(tOut);
+
       filterTransactions(); renderAnalyticsChart();
     }
 
@@ -1100,46 +943,73 @@
       let canvas = document.getElementById('pocketDonutChart'); if (!canvas) return;
       let ctx = canvas.getContext('2d');
       if (donutChartInstance) donutChartInstance.destroy();
+      const isLight = document.body.classList.contains('light-theme');
       donutChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
           labels: globalPockets.map(p => p.name),
           datasets: [
-            { label: 'Budget', data: globalPockets.map(p => p.allocated), backgroundColor: '#3b82f6' },
-            { label: 'Realisasi', data: globalPockets.map(p => p.spent), backgroundColor: '#f43f5e' }
+            { label: 'Budget', data: globalPockets.map(p => p.allocated), backgroundColor: '#3b82f6', borderRadius: 4 },
+            { label: 'Realisasi', data: globalPockets.map(p => p.spent), backgroundColor: '#f43f5e', borderRadius: 4 }
           ]
         },
-        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false }
+        options: { 
+          indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { labels: { color: isLight ? '#0f172a' : '#f8fafc' } } },
+          scales: {
+            x: { ticks: { color: isLight ? '#0f172a' : '#94a3b8' }, grid: { color: isLight ? '#cbd5e1' : '#1e293b' } },
+            y: { ticks: { color: isLight ? '#0f172a' : '#f8fafc' }, grid: { display: false } }
+          }
+        }
       });
     }
 
     let selectedFormType = "Pemasukan";
     function setFormType(type) {
       selectedFormType = type;
-      document.getElementById('formPocketWrapper').className = (type === "Pemasukan") ? "hidden" : "";
+      let btnIn = document.getElementById('btnFormIn'); let btnOut = document.getElementById('btnFormOut');
+      if (type === "Pemasukan") {
+        btnIn.className = "py-1.5 text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg uppercase transition";
+        btnOut.className = "py-1.5 text-[10px] font-bold bg-transparent text-slate-500 border border-slate-500/10 hover:border-slate-500/20 rounded-lg uppercase transition";
+        document.getElementById('formPocketWrapper').classList.add('hidden');
+      } else {
+        btnOut.className = "py-1.5 text-[10px] font-bold bg-pink-500/20 text-pink-500 border border-pink-500/30 rounded-lg uppercase transition";
+        btnIn.className = "py-1.5 text-[10px] font-bold bg-transparent text-slate-500 border border-slate-500/10 hover:border-slate-500/20 rounded-lg uppercase transition";
+        document.getElementById('formPocketWrapper').classList.remove('hidden');
+      }
     }
 
     async function submitTransaction() {
-      let amount = document.getElementById('txAmount').value;
-      let notes = document.getElementById('txNotes').value;
+      let amount = document.getElementById('txAmount').value; let notes = document.getElementById('txNotes').value;
       let pocket = document.getElementById('txPocket').value;
-      if (!amount || parseFloat(amount) <= 0) return;
+      if (!amount || parseFloat(amount) <= 0) { showCustomAlert("Gagal", "Nominal wajib diisi dengan benar.", "error"); return; }
+      
+      document.getElementById('btnSubmit').innerText = "MENYIMPAN..."; document.getElementById('btnSubmit').disabled = true;
 
       if (isMockMode) {
-        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY));
-        let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
-        transactions.unshift({ index: transactions.length + 1, date: new Date().toISOString(), type: selectedFormType, pocket: (selectedFormType === "Pemasukan") ? "Semua" : pocket, amount: parseFloat(amount), notes });
-        pockets.forEach(p => {
-          if (selectedFormType === "Pemasukan") p.allocated += parseFloat(amount) * (p.percentage / 100);
-          else if (p.name === pocket) p.spent += parseFloat(amount);
-          p.remaining = p.allocated - p.spent;
-        });
-        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets));
-        localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
-        loadAllSystemData(); showCustomAlert("Sukses", "Kas disimpan.", "success");
+        setTimeout(() => {
+          let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)); let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
+          transactions.unshift({ index: transactions.length + 1, date: new Date().toISOString(), type: selectedFormType, pocket: (selectedFormType === "Pemasukan") ? "Semua" : pocket, amount: parseFloat(amount), notes: notes || "-" });
+          pockets.forEach(p => {
+            if (selectedFormType === "Pemasukan") p.allocated += parseFloat(amount) * (p.percentage / 100);
+            else if (p.name === pocket) p.spent += parseFloat(amount);
+            p.remaining = p.allocated - p.spent;
+          });
+          localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+          
+          document.getElementById('btnSubmit').innerText = "Rekam Transaksi"; document.getElementById('btnSubmit').disabled = false;
+          document.getElementById('txAmount').value = ""; document.getElementById('txNotes').value = ""; document.getElementById('txAmountFormatted').innerText = "Rp 0";
+          loadAllSystemData(); showCustomAlert("Sukses", "Kas disimpan.", "success");
+        }, 500);
       } else {
         let res = await executeCloudApi('addTransaction', { sheetId: session.sheetId, type: selectedFormType, pocketName: pocket, amount, notes, userEmail: session.email });
-        if (res && res.success) { loadAllSystemData(); showCustomAlert("Sukses", "Kas cloud tersimpan.", "success"); }
+        document.getElementById('btnSubmit').innerText = "Rekam Transaksi"; document.getElementById('btnSubmit').disabled = false;
+        if (res && res.success) {
+          document.getElementById('txAmount').value = ""; document.getElementById('txNotes').value = ""; document.getElementById('txAmountFormatted').innerText = "Rp 0";
+          loadAllSystemData();
+          if (res.warning) showCustomAlert("Overbudget!", res.msg, "warning");
+          else showCustomAlert("Sukses", "Kas cloud tersimpan.", "success");
+        }
       }
     }
 
@@ -1148,16 +1018,26 @@
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(tabId).classList.remove('hidden');
       if(document.getElementById(`btn-${tabId}`)) document.getElementById(`btn-${tabId}`).classList.add('active');
+      const titles = { 'tab-dashboard': 'IKHTISAR SAKU', 'tab-transactions': 'BUKU RIWAYAT', 'tab-pockets': 'KELOLA KANTONG', 'tab-transfer': 'KIRIM SALDO' };
+      document.getElementById('pageTitle').innerText = titles[tabId];
+      if (window.innerWidth < 1024) toggleMobileSidebar();
     }
 
     function switchAuthState(state) {
       currentAuthState = state;
+      document.getElementById('authMessage').innerText = "";
       document.getElementById('passwordFieldGroup').style.display = (state === 'forgot' || state === 'reset') ? 'none' : 'block';
       document.getElementById('resetFieldsGroup').className = (state === 'reset') ? 'space-y-4' : 'hidden';
       document.getElementById('authButtons').className = (state === 'login') ? 'space-y-3' : 'hidden';
       document.getElementById('registerButtons').className = (state === 'register') ? 'space-y-3' : 'hidden';
       document.getElementById('forgotButtons').className = (state === 'forgot' || state === 'reset') ? 'space-y-3' : 'hidden';
-      document.getElementById('btnExecuteReset').className = (state === 'reset') ? 'w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase' : 'hidden';
+      document.getElementById('btnExecuteReset').className = (state === 'reset') ? 'w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider' : 'hidden';
+      
+      const authTitle = document.getElementById('authTitle');
+      if(state === 'login') authTitle.innerHTML = '<i class="fa-solid fa-shield-halved text-blue-500"></i> Masuk';
+      if(state === 'register') authTitle.innerHTML = '<i class="fa-solid fa-plus text-emerald-500"></i> Buat Akun Baru';
+      if(state === 'forgot') authTitle.innerHTML = '<i class="fa-solid fa-circle-question text-amber-500"></i> Lupa Sandi';
+      if(state === 'reset') authTitle.innerHTML = '<i class="fa-solid fa-key text-blue-500"></i> Setel Ulang Sandi';
     }
 
     async function handleAuthSubmit() {
@@ -1166,58 +1046,114 @@
     }
 
     async function handleLogin() {
-      let email = document.getElementById('email').value.trim();
-      let pass = document.getElementById('password').value.trim();
+      let email = document.getElementById('email').value.trim(); let pass = document.getElementById('password').value.trim();
       let hashed = await hashPassword(pass);
+      document.getElementById('authMessage').innerText = "Memverifikasi...";
+      
       if (isMockMode) {
-        let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY));
-        let match = users.find(u => u.email === email && u.password === pass);
-        if (match) { session.sheetId = match.sheetId; session.email = match.email; saveSession(session.sheetId, session.email); setupUIOnLogin(); }
-        else showCustomAlert("Gagal", "Password salah.", "error");
+        setTimeout(() => {
+          let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY));
+          let match = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === hashed);
+          if (match) { session.sheetId = match.sheetId; session.email = match.email; saveSession(session.sheetId, session.email); setupUIOnLogin(); }
+          else { document.getElementById('authMessage').innerText = ""; showCustomAlert("Gagal", "Email/Password salah.", "error"); }
+        }, 800);
       } else {
         let res = await executeCloudApi('loginUser', { email, password: hashed });
+        document.getElementById('authMessage').innerText = "";
         if (res && res.success) { session.sheetId = res.sheetId; session.email = res.email; saveSession(session.sheetId, session.email); setupUIOnLogin(); }
-        else showCustomAlert("Gagal", "Kredensial cloud ditolak.", "error");
+        else showCustomAlert("Gagal", res ? res.message : "Gagal menghubungi server.", "error");
       }
     }
 
     async function handleRegister() {
-      let email = document.getElementById('email').value.trim();
-      let pass = document.getElementById('password').value.trim();
+      let email = document.getElementById('email').value.trim(); let pass = document.getElementById('password').value.trim();
+      if(pass.length < 6) { showCustomAlert("Lemah", "Sandi minimal 6 karakter.", "error"); return; }
       let hashed = await hashPassword(pass);
+      document.getElementById('authMessage').innerText = "Mendaftarkan...";
+      
       if (isMockMode) {
-        let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY)) || [];
-        users.push({ email, password: pass, sheetId: "MOCK_" + Date.now() });
-        localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
-        showCustomAlert("Sukses", "User baru dibuat.", "success"); switchAuthState('login');
+        setTimeout(() => {
+          let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY)) || [];
+          if(users.find(u => u.email.toLowerCase() === email.toLowerCase())) { document.getElementById('authMessage').innerText = ""; showCustomAlert("Gagal", "Email sudah terdaftar.", "error"); return; }
+          users.push({ email, password: hashed, sheetId: "MOCK_" + Date.now(), otp: "" });
+          localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
+          document.getElementById('authMessage').innerText = ""; showCustomAlert("Sukses", "Akun berhasil dibuat. Silakan login.", "success"); switchAuthState('login');
+        }, 800);
       } else {
         let res = await executeCloudApi('registerUser', { email, password: hashed });
-        if (res && res.success) { showCustomAlert("Sukses", "Database cloud dikonfigurasi.", "success"); switchAuthState('login'); }
+        document.getElementById('authMessage').innerText = "";
+        if (res && res.success) { showCustomAlert("Sukses", "Akun & Database cloud dibuat.", "success"); switchAuthState('login'); }
+        else showCustomAlert("Gagal", res ? res.message : "Pendaftaran gagal.", "error");
+      }
+    }
+
+    async function sendPasswordResetCode() {
+      let email = document.getElementById('email').value.trim();
+      if(!email) { showCustomAlert("Gagal", "Masukkan email.", "error"); return; }
+      document.getElementById('authMessage').innerText = "Mengirim OTP...";
+      
+      if (isMockMode) {
+        setTimeout(() => {
+          let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY)) || [];
+          let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+          if (user) {
+            user.otp = "123456"; localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
+            document.getElementById('authMessage').innerText = ""; showCustomAlert("Simulasi", "OTP dikirim (Simulasi lokal: 123456).", "success"); switchAuthState('reset');
+          } else { document.getElementById('authMessage').innerText = ""; showCustomAlert("Gagal", "Email tidak ditemukan.", "error"); }
+        }, 800);
+      } else {
+        let res = await executeCloudApi('forgotPassword', { email });
+        document.getElementById('authMessage').innerText = "";
+        if (res && res.success) { showCustomAlert("Sukses", res.message, "success"); switchAuthState('reset'); }
+        else showCustomAlert("Gagal", res ? res.message : "Pengiriman OTP gagal.", "error");
+      }
+    }
+
+    async function executeResetPassword() {
+      let email = document.getElementById('email').value.trim();
+      let otp = document.getElementById('resetOTP').value.trim();
+      let newPass = document.getElementById('newPassword').value.trim();
+      if(!otp || !newPass) { showCustomAlert("Gagal", "Lengkapi OTP dan Sandi Baru.", "error"); return; }
+      let hashed = await hashPassword(newPass);
+      document.getElementById('authMessage').innerText = "Verifikasi...";
+      
+      if (isMockMode) {
+        setTimeout(() => {
+          let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY)) || [];
+          let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+          if (user && user.otp === otp) {
+            user.password = hashed; user.otp = ""; localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
+            document.getElementById('authMessage').innerText = ""; showCustomAlert("Sukses", "Sandi diubah.", "success"); switchAuthState('login');
+          } else { document.getElementById('authMessage').innerText = ""; showCustomAlert("Gagal", "OTP Salah.", "error"); }
+        }, 800);
+      } else {
+        let res = await executeCloudApi('resetPasswordWithCode', { email, otpCode: otp, newPassword: hashed });
+        document.getElementById('authMessage').innerText = "";
+        if (res && res.success) { showCustomAlert("Sukses", "Sandi diubah. Silakan login.", "success"); switchAuthState('login'); }
+        else showCustomAlert("Gagal", res ? res.message : "Reset sandi gagal.", "error");
       }
     }
 
     async function handleDeleteTransaction(txIndex) {
       showCustomConfirm("Hapus?", "Data kas akan dihapus dari riwayat saku?", async function() {
         if (isMockMode) {
-          let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY));
-          let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
+          let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)); let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
           let tx = transactions.find(t => t.index === txIndex);
           if (tx.type === "Pemasukan") pockets.forEach(p => { p.allocated -= tx.amount * (p.percentage / 100); });
           else pockets.forEach(p => { if (p.name === tx.pocket) p.spent -= tx.amount; p.remaining = p.allocated - p.spent; });
           transactions = transactions.filter(t => t.index !== txIndex);
-          localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets));
-          localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
-          loadAllSystemData();
+          localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+          loadAllSystemData(); showCustomAlert("Sukses", "Transaksi lokal dihapus.", "success");
         } else {
           let res = await executeCloudApi('deleteTransaction', { sheetId: session.sheetId, txIndex });
-          if (res && res.success) loadAllSystemData();
+          if (res && res.success) { loadAllSystemData(); showCustomAlert("Sukses", "Transaksi dihapus.", "success"); }
         }
       });
     }
 
     window.onload = function() {
       document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-      initTheme();
+      initTheme(); setFormType('Pemasukan');
       if (restoreSession()) setupUIOnLogin();
       else if (isMockMode) { initializeMockData(); document.getElementById('email').value = "demo@keluarga.com"; document.getElementById('password').value = "demo123"; }
     };
