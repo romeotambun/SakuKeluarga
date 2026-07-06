@@ -303,7 +303,7 @@
         </div>
 
         <div id="forgotButtons" class="space-y-3 hidden">
-          <button type="button" onclick="sendPasswordResetCode()" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider">Kirim Kode OTP</button>
+          <button type="button" onclick="sendPasswordResetCode()" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition">Kirim Kode OTP</button>
           <button type="button" onclick="executeResetPassword()" id="btnExecuteReset" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hidden">Setel Ulang Sandi</button>
           <p class="text-[10px] text-center font-semibold text-slate-400"><a href="#" onclick="switchAuthState('login')" class="text-slate-300 hover:underline">Kembali ke Login</a></p>
         </div>
@@ -317,7 +317,7 @@
   <div id="dashboardContainer" class="hidden h-screen w-screen flex overflow-hidden relative">
     <div id="sidebarOverlay" class="hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden" onclick="toggleMobileSidebar()"></div>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR (DESKTOP NAV & MOBILE PROFILE DRAWER) -->
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 border-r flex flex-col justify-between bg-[#090d1a] transition-transform duration-300 -translate-x-full lg:translate-x-0 lg:static h-full">
       <div>
         <div class="p-5 border-b flex items-center justify-between border-slate-800">
@@ -617,12 +617,12 @@
         });
         return await response.json();
       } catch (err) {
-        showCustomAlert("Kesalahan Jaringan", "Gagal menghubungi server Cloud API: " + err.toString(), "error");
+        showCustomAlert("Kesalahan Jaringan", "Gagal menghubungi server API Cloud: " + err.toString(), "error");
         return { success: false, message: err.toString() };
       }
     }
 
-    // ULTRA AMAN NULL CHECK UNTUK MENCEGAH CANNOT READ PROPERTIES OF UNDEFINED
+    // ULTRA AMAN NULL CHECK
     function isInvestmentPocket(name) { 
       if (!name) return false;
       return /tabungan|saham|investasi|reksadana|deposito|savings|investment/i.test(name.toString()); 
@@ -763,7 +763,7 @@
       if (t.type === "Pengeluaran") document.getElementById('editTxPocket').value = t.pocket || "";
       document.getElementById('editTxAmount').value = t.amount || 0; 
       document.getElementById('editTxNotes').value = t.notes || "";
-      liveFormatCurrencyRaw('editTxAmount', 'editTxAmountFormatted'); checkEditTxType();
+      liveFormatCurrency('editTxAmount', 'editTxAmountFormatted'); checkEditTxType();
       document.getElementById('editTransactionModal').classList.remove('hidden');
     }
     function closeEditTransactionModal() { document.getElementById('editTransactionModal').classList.add('hidden'); }
@@ -816,7 +816,12 @@
       document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
-    function toggleMobileSidebar() { document.getElementById('sidebar').classList.toggle('-translate-x-full'); document.getElementById('sidebarOverlay').classList.toggle('hidden'); }
+    function toggleMobileSidebar() { 
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      sidebar.classList.toggle('-translate-x-full'); 
+      overlay.classList.toggle('hidden'); 
+    }
 
     function saveSession(sheetId, email) {
       localStorage.setItem('S_ID', sheetId); localStorage.setItem('S_EM', email); localStorage.setItem('S_EX', (Date.now() + sessionTimeout).toString());
@@ -836,8 +841,8 @@
 
     function togglePasswordVisibility(inputId, iconId) {
       let input = document.getElementById(inputId); let icon = document.getElementById(iconId);
-      if (input.type === 'password') { input.type = 'text'; icon.className = 'fa-solid fa-eye-slash'; }
-      else { input.type = 'password'; icon.className = 'fa-solid fa-eye'; }
+      if (input.type === 'password') { input.type = 'text'; icon.className = 'fa-solid fa-eye-slash text-slate-400'; }
+      else { input.type = 'password'; icon.className = 'fa-solid fa-eye text-slate-500'; }
     }
 
     function toggleTheme() { let isL = document.body.classList.toggle('light-theme'); localStorage.setItem('THEME', isL ? 'light' : 'dark'); updateThemeUI(isL); }
@@ -847,7 +852,7 @@
     }
     function updateThemeUI(isL) {
       let btn = document.getElementById('themeToggleBtn'); if (!btn) return;
-      btn.innerHTML = isL ? `<i class="fa-solid fa-sun text-amber-500"></i> Terang` : `<i class="fa-solid fa-moon text-amber-400"></i> Gelap`;
+      btn.innerHTML = isL ? `<i class="fa-solid fa-sun text-amber-500"></i> <span id="themeToggleText">Terang</span>` : `<i class="fa-solid fa-moon text-amber-400"></i> <span id="themeToggleText">Gelap</span>`;
       if (globalPockets.length > 0) renderAnalyticsChart();
     }
 
@@ -920,7 +925,6 @@
 
     function resetPageAndFilter() { currentPage = 1; filterTransactions(); }
 
-    // DETEKSI DAN PROTEKSI ANTI CRASH .toLowerCase() PADA DATA KOSONG SPREADSHEET
     function filterTransactions() {
       let searchInput = document.getElementById('txSearch');
       let query = searchInput ? searchInput.value.toString().toLowerCase() : "";
@@ -929,10 +933,8 @@
       
       let filtered = globalTransactions.filter(t => {
         if (!t) return false;
-        // Penanganan Ultra Aman Null Pointer Check
         let noteText = t.notes ? t.notes.toString().toLowerCase() : "";
         let pocketText = t.pocket ? t.pocket.toString().toLowerCase() : "";
-        
         let matchQuery = noteText.includes(query) || pocketText.includes(query);
         let matchType = typeFilter === "Semua" || t.type === typeFilter;
         return matchQuery && matchType;
@@ -1035,12 +1037,6 @@
       document.getElementById('metricTotalExpense').innerText = formatRupiah(tOut);
 
       filterTransactions(); renderAnalyticsChart();
-    }
-
-    // PROTEKSI EMAIL LOWERCASE PADA DATA MOCK LOKAL JIKA TERJADI PERUBAHAN VERSI
-    function checkUserMockMatch(u, email, hashed) {
-      if(!u || !u.email) return false;
-      return u.email.toString().toLowerCase() === email.toString().toLowerCase() && u.password === hashed;
     }
 
     function renderAnalyticsChart() {
@@ -1159,7 +1155,7 @@
       if (isMockMode) {
         setTimeout(() => {
           let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY)) || [];
-          let match = users.find(u => checkUserMockMatch(u, email, hashed));
+          let match = users.find(u => u && u.email && u.email.toString().toLowerCase() === email.toLowerCase() && u.password === hashed);
           if (match) { session.sheetId = match.sheetId; session.email = match.email; saveSession(session.sheetId, session.email); setupUIOnLogin(); }
           else { document.getElementById('authMessage').innerText = ""; showCustomAlert("Gagal", "Email/Password salah.", "error"); }
         }, 800);
