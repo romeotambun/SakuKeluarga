@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SakuKeluarga - Hub Keuangan Keluarga</title>
   
+  <!-- MANIFEST UNTUK PWA (INSTALL DI HP) -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#3b82f6">
   
@@ -50,13 +51,11 @@
     .premium-panel { background: var(--bg-panel); border: 1px solid var(--border-panel); box-shadow: var(--shadow-panel); transition: all 0.3s ease; }
     .premium-panel:hover { border-color: var(--border-panel-hover); }
     
-    /* SIDEBAR DESKTOP BUTTONS */
     .nav-btn { position: relative; transition: all 0.2s ease-in-out; color: var(--text-secondary); }
     .nav-btn::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%) scaleY(0); width: 4px; height: 24px; background-color: #3b82f6; border-radius: 0 4px 4px 0; transition: all 0.2s ease-in-out; }
     .nav-btn.active { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
     .nav-btn.active::before { transform: translateY(-50%) scaleY(1); }
 
-    /* MOBILE BOTTOM NAV */
     .mobile-bottom-nav {
       background-color: var(--header-bg);
       border-color: var(--border-color);
@@ -119,7 +118,7 @@
   <!-- EDIT POCKET MODAL -->
   <div id="editPocketModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
     <div class="custom-modal-box max-w-md w-full p-6 rounded-2xl shadow-2xl border">
-      <h3 class="text-base font-bold tracking-tight mb-4 border-b pb-2 text-primary-theme"><i class="fa-solid fa-edit text-blue-500 mr-2"></i>Edit Kantong</h3>
+      <h3 class="text-base font-bold tracking-tight mb-4 border-b pb-2 text-primary-theme"><i class="fa-solid fa-edit text-blue-500 mr-2"></i>Edit Kantong Keuangan</h3>
       <input type="hidden" id="editPocketOldName">
       <div class="space-y-4">
         <div>
@@ -159,7 +158,7 @@
       </div>
       <div class="grid grid-cols-2 gap-3 mt-6">
         <button onclick="closeEditPocketModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl font-bold text-xs uppercase border border-slate-700">Batal</button>
-        <button onclick="saveEditPocket()" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase">Simpan</button>
+        <button onclick="saveEditPocket()" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase">Simpan Perubahan</button>
       </div>
     </div>
   </div>
@@ -304,7 +303,7 @@
         </div>
 
         <div id="forgotButtons" class="space-y-3 hidden">
-          <button type="button" onclick="sendPasswordResetCode()" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition">Kirim Kode OTP</button>
+          <button type="button" onclick="sendPasswordResetCode()" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider">Kirim Kode OTP</button>
           <button type="button" onclick="executeResetPassword()" id="btnExecuteReset" class="w-full btn-gradient-blue text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider hidden">Setel Ulang Sandi</button>
           <p class="text-[10px] text-center font-semibold text-slate-400"><a href="#" onclick="switchAuthState('login')" class="text-slate-300 hover:underline">Kembali ke Login</a></p>
         </div>
@@ -318,7 +317,7 @@
   <div id="dashboardContainer" class="hidden h-screen w-screen flex overflow-hidden relative">
     <div id="sidebarOverlay" class="hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden" onclick="toggleMobileSidebar()"></div>
 
-    <!-- SIDEBAR (DESKTOP NAV & MOBILE PROFILE DRAWER) -->
+    <!-- SIDEBAR -->
     <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 border-r flex flex-col justify-between bg-[#090d1a] transition-transform duration-300 -translate-x-full lg:translate-x-0 lg:static h-full">
       <div>
         <div class="p-5 border-b flex items-center justify-between border-slate-800">
@@ -383,7 +382,6 @@
         </div>
       </header>
 
-      <!-- PADDING BOTTOM DITAMBAHKAN UNTUK MOBILE NAV BAR -->
       <div class="flex-1 overflow-y-auto p-4 sm:p-5 relative pb-24 lg:pb-5">
         <div id="alertBox" class="hidden bg-red-950/60 border border-red-500/40 text-red-200 p-3.5 rounded-xl mb-4 flex items-center justify-between shadow-lg">
           <div class="flex items-center space-x-2.5"><div class="w-7 h-7 rounded-lg bg-red-500 text-black font-extrabold flex items-center justify-center text-xs">⚠️</div><p id="alertMsg" class="text-[10px] font-medium uppercase tracking-wide leading-relaxed"></p></div>
@@ -619,15 +617,25 @@
         });
         return await response.json();
       } catch (err) {
-        showCustomAlert("Kesalahan Jaringan", "Gagal menghubungi server API Cloud: " + err.toString(), "error");
+        showCustomAlert("Kesalahan Jaringan", "Gagal menghubungi server Cloud API: " + err.toString(), "error");
         return { success: false, message: err.toString() };
       }
     }
 
-    function isInvestmentPocket(name) { return /tabungan|saham|investasi|reksadana|deposito|savings|investment/i.test(name); }
-    function formatRupiah(amount) { return "Rp " + parseFloat(amount).toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
+    // ULTRA AMAN NULL CHECK UNTUK MENCEGAH CANNOT READ PROPERTIES OF UNDEFINED
+    function isInvestmentPocket(name) { 
+      if (!name) return false;
+      return /tabungan|saham|investasi|reksadana|deposito|savings|investment/i.test(name.toString()); 
+    }
+    
+    function formatRupiah(amount) { 
+      let num = parseFloat(amount);
+      if (isNaN(num)) return "Rp 0";
+      return "Rp " + num.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); 
+    }
     
     function formatDateTimeConsistent(dateInput) {
+      if (!dateInput) return "-";
       const date = new Date(dateInput); if (isNaN(date.getTime())) return "-";
       const day = String(date.getDate()).padStart(2, '0');
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -645,8 +653,11 @@
       const msgEl = document.getElementById('customAlertMessage');
       const iconBg = document.getElementById('customAlertIconBg');
       const icon = document.getElementById('customAlertIcon');
-      titleEl.innerText = title; msgEl.innerText = message;
+      
+      titleEl.innerText = title || "Notifikasi"; 
+      msgEl.innerText = message || "";
       iconBg.className = "w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center text-2xl border"; icon.className = "fa-solid";
+      
       if (type === 'error') { iconBg.classList.add('bg-red-500/10', 'text-red-500', 'border-red-500/20'); icon.classList.add('fa-circle-xmark'); }
       else if (type === 'success') { iconBg.classList.add('bg-emerald-500/10', 'text-emerald-500', 'border-emerald-500/20'); icon.classList.add('fa-circle-check'); }
       else if (type === 'warning') { iconBg.classList.add('bg-amber-500/10', 'text-amber-500', 'border-amber-500/20'); icon.classList.add('fa-triangle-exclamation'); }
@@ -667,10 +678,13 @@
     }
 
     function openEditPocketModal(pocketName) {
-      let p = globalPockets.find(item => item.name === pocketName); if (!p) return;
-      document.getElementById('editPocketOldName').value = p.name; document.getElementById('editPocketName').value = p.name;
-      document.getElementById('editPocketPercentage').value = p.percentage; document.getElementById('editPocketIcon').value = p.icon;
-      document.getElementById('editPocketColor').value = p.color; document.getElementById('editPocketModal').classList.remove('hidden');
+      let p = globalPockets.find(item => item && item.name === pocketName); if (!p) return;
+      document.getElementById('editPocketOldName').value = p.name || ""; 
+      document.getElementById('editPocketName').value = p.name || "";
+      document.getElementById('editPocketPercentage').value = p.percentage || 0; 
+      document.getElementById('editPocketIcon').value = p.icon || "fa-solid fa-wallet";
+      document.getElementById('editPocketColor').value = p.color || "#3b82f6"; 
+      document.getElementById('editPocketModal').classList.remove('hidden');
     }
     function closeEditPocketModal() { document.getElementById('editPocketModal').classList.add('hidden'); }
 
@@ -681,13 +695,14 @@
       let icon = document.getElementById('editPocketIcon').value; let color = document.getElementById('editPocketColor').value;
 
       if (!newName || percentage <= 0) { showCustomAlert("Data Salah", "Isi parameter saku secara lengkap!", "error"); return; }
-      let otherTotal = globalPockets.filter(p => p.name !== oldName).reduce((sum, p) => sum + p.percentage, 0);
+      let otherTotal = globalPockets.filter(p => p && p.name !== oldName).reduce((sum, p) => sum + (p.percentage || 0), 0);
       if (otherTotal + percentage > 100) { showCustomAlert("Gagal", `Alokasi melebihi batas 100% (Sisa kuota: ${100 - otherTotal}%).`, "error"); return; }
 
       if (isMockMode) {
-        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)); let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
-        pockets.forEach(p => { if (p.name === oldName) { p.name = newName; p.percentage = percentage; p.icon = icon; p.color = color; } });
-        if (oldName !== newName) transactions.forEach(t => { if (t.pocket === oldName) t.pocket = newName; });
+        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)) || []; 
+        let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY)) || [];
+        pockets.forEach(p => { if (p && p.name === oldName) { p.name = newName; p.percentage = percentage; p.icon = icon; p.color = color; } });
+        if (oldName !== newName) transactions.forEach(t => { if (t && t.pocket === oldName) t.pocket = newName; });
         localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
         closeEditPocketModal(); loadAllSystemData(); showCustomAlert("Sukses", "Perubahan saku lokal disimpan.", "success");
       } else {
@@ -697,12 +712,12 @@
     }
 
     function openDeletePocketModal(pocketName) {
-      if (globalPockets.length <= 1) { showCustomAlert("Batal", "Sistem membutuhkan minimal satu saku aktif!", "error"); return; }
+      if (globalPockets.length <= 1) { showCustomAlert("Batal", "Anda harus menyisakan minimal satu saku aktif!", "error"); return; }
       document.getElementById('deletePocketSource').value = pocketName;
       document.getElementById('deletePocketHeading').innerText = `Saku "${pocketName}" akan dibongkar. Pilih target pelimpahan anggaran kalkulasi saldo:`;
       let targetDropdown = document.getElementById('deletePocketTarget'); targetDropdown.innerHTML = "";
       globalPockets.forEach(p => {
-        if (p.name !== pocketName) {
+        if (p && p.name !== pocketName) {
           let opt = document.createElement('option'); opt.value = p.name; opt.innerText = `${p.name} (Saldo: ${formatRupiah(p.remaining)})`; targetDropdown.appendChild(opt);
         }
       });
@@ -716,14 +731,18 @@
       let redistributeMode = document.getElementById('deletePocketRedistribute').value;
 
       if (isMockMode) {
-        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)); let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
-        let delItem = pockets.find(p => p.name === pocketToDelete); let tgtItem = pockets.find(p => p.name === targetPocket);
-        tgtItem.allocated += delItem.allocated; tgtItem.spent += delItem.spent;
-        if (redistributeMode === "target") tgtItem.percentage += delItem.percentage;
-        else { let share = delItem.percentage / (pockets.length - 1); pockets.forEach(p => { if (p.name !== pocketToDelete) p.percentage += share; }); }
-        transactions.forEach(t => { if (t.pocket === pocketToDelete) t.pocket = targetPocket; });
-        pockets = pockets.filter(p => p.name !== pocketToDelete);
-        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)) || []; 
+        let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY)) || [];
+        let delItem = pockets.find(p => p && p.name === pocketToDelete); 
+        let tgtItem = pockets.find(p => p && p.name === targetPocket);
+        if(delItem && tgtItem) {
+          tgtItem.allocated += delItem.allocated; tgtItem.spent += delItem.spent;
+          if (redistributeMode === "target") tgtItem.percentage += delItem.percentage;
+          else { let share = delItem.percentage / (pockets.length - 1); pockets.forEach(p => { if (p && p.name !== pocketToDelete) p.percentage += share; }); }
+          transactions.forEach(t => { if (t && t.pocket === pocketToDelete) t.pocket = targetPocket; });
+          pockets = pockets.filter(p => p && p.name !== pocketToDelete);
+          localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+        }
         closeDeletePocketModal(); loadAllSystemData(); showCustomAlert("Sukses", "Saku lokal dilebur.", "success");
       } else {
         let res = await executeCloudApi('deleteAndReallocatePocketInSheet', { sheetId: session.sheetId, pocketToDelete, targetPocket, redistributeMode });
@@ -737,13 +756,14 @@
     }
 
     function openEditTransactionModal(txIndex) {
-      let t = globalTransactions.find(item => item.index === txIndex); if (!t) return;
-      document.getElementById('editTxIndex').value = txIndex; document.getElementById('editTxType').value = t.type;
+      let t = globalTransactions.find(item => item && item.index === txIndex); if (!t) return;
+      document.getElementById('editTxIndex').value = txIndex; document.getElementById('editTxType').value = t.type || "Pengeluaran";
       let editTxPocket = document.getElementById('editTxPocket'); editTxPocket.innerHTML = "";
-      globalPockets.forEach(p => { let opt = document.createElement('option'); opt.value = p.name; opt.innerText = p.name; editTxPocket.appendChild(opt); });
-      if (t.type === "Pengeluaran") document.getElementById('editTxPocket').value = t.pocket;
-      document.getElementById('editTxAmount').value = t.amount; document.getElementById('editTxNotes').value = t.notes;
-      liveFormatCurrency('editTxAmount', 'editTxAmountFormatted'); checkEditTxType();
+      globalPockets.forEach(p => { if(p) { let opt = document.createElement('option'); opt.value = p.name; opt.innerText = p.name; editTxPocket.appendChild(opt); } });
+      if (t.type === "Pengeluaran") document.getElementById('editTxPocket').value = t.pocket || "";
+      document.getElementById('editTxAmount').value = t.amount || 0; 
+      document.getElementById('editTxNotes').value = t.notes || "";
+      liveFormatCurrencyRaw('editTxAmount', 'editTxAmountFormatted'); checkEditTxType();
       document.getElementById('editTransactionModal').classList.remove('hidden');
     }
     function closeEditTransactionModal() { document.getElementById('editTransactionModal').classList.add('hidden'); }
@@ -757,16 +777,19 @@
       if (amount <= 0) { showCustomAlert("Input Error", "Masukkan nominal secara benar!", "error"); return; }
 
       if (isMockMode) {
-        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)) || []; let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY)) || [];
-        let tx = transactions.find(t => t.index === txIndex);
-        if (tx.type === "Pemasukan") pockets.forEach(p => { p.allocated = Math.max(0, p.allocated - (tx.amount * (p.percentage / 100))); });
-        else pockets.forEach(p => { if (p.name === tx.pocket) p.spent = Math.max(0, p.spent - tx.amount); });
-        
-        tx.type = type; tx.pocket = (type === "Pemasukan") ? "Semua" : pocket; tx.amount = amount; tx.notes = notes || "-";
-        if (type === "Pemasukan") pockets.forEach(p => { p.allocated += amount * (p.percentage / 100); p.remaining = p.allocated - p.spent; });
-        else pockets.forEach(p => { if (p.name === pocket) { p.spent += amount; p.remaining = p.allocated - p.spent; } });
-        
-        localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)) || []; 
+        let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY)) || [];
+        let tx = transactions.find(t => t && t.index === txIndex);
+        if(tx) {
+          if (tx.type === "Pemasukan") pockets.forEach(p => { if(p) p.allocated = Math.max(0, p.allocated - (tx.amount * ((p.percentage || 0) / 100))); });
+          else pockets.forEach(p => { if (p && p.name === tx.pocket) p.spent = Math.max(0, p.spent - tx.amount); });
+          
+          tx.type = type; tx.pocket = (type === "Pemasukan") ? "Semua" : pocket; tx.amount = amount; tx.notes = notes || "-";
+          if (type === "Pemasukan") pockets.forEach(p => { if(p) { p.allocated += amount * ((p.percentage || 0) / 100); p.remaining = p.allocated - p.spent; } });
+          else pockets.forEach(p => { if (p && p.name === pocket) { p.spent += amount; p.remaining = p.allocated - p.spent; } });
+          
+          localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+        }
         closeEditTransactionModal(); loadAllSystemData(); showCustomAlert("Sukses", "Kas lokal direkonsiliasi.", "success");
       } else {
         let res = await executeCloudApi('updateTransactionInSheet', { sheetId: session.sheetId, txIndex, type, pocketName: pocket, amount, notes });
@@ -775,14 +798,19 @@
     }
 
     function downloadCSVReport() {
-      let monthFilter = document.getElementById('exportMonth').value; let yearFilter = document.getElementById('exportYear').value;
+      let monthFilter = document.getElementById('exportMonth').value; 
+      let yearFilter = document.getElementById('exportYear').value;
       let filtered = globalTransactions.filter(t => {
+        if(!t) return false;
         let d = new Date(t.date); if (isNaN(d.getTime())) return false;
         return (monthFilter === "all" || d.getMonth().toString() === monthFilter) && (yearFilter === "all" || d.getFullYear().toString() === yearFilter);
       });
       if (filtered.length === 0) { showCustomAlert("Gagal", "Tidak ada data riwayat yang cocok.", "warning"); return; }
       let csvContent = "\uFEFFDate,Type,Pocket,Amount,Notes\n";
-      filtered.forEach(t => { csvContent += `"${formatDateTimeConsistent(t.date)}","${t.type}","${t.pocket}",${t.amount},"${t.notes.replace(/"/g, '""')}"\n`; });
+      filtered.forEach(t => { 
+        let noteClean = t.notes ? t.notes.replace(/"/g, '""') : "-";
+        csvContent += `"${formatDateTimeConsistent(t.date)}","${t.type || ''}","${t.pocket || ''}",${t.amount || 0},"${noteClean}"\n`; 
+      });
       let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); let url = URL.createObjectURL(blob);
       let link = document.createElement("a"); link.setAttribute("href", url); link.setAttribute("download", `Laporan_Kas_${yearFilter}.csv`);
       document.body.appendChild(link); link.click(); document.body.removeChild(link);
@@ -837,8 +865,11 @@
     }
 
     function setupUIOnLogin() {
-      document.getElementById('userDisplay').innerText = session.email; document.getElementById('userInitial').innerText = session.email.charAt(0).toUpperCase();
-      document.getElementById('authContainer').classList.add('hidden'); document.getElementById('dashboardContainer').classList.remove('hidden'); loadAllSystemData();
+      document.getElementById('userDisplay').innerText = session.email || ""; 
+      document.getElementById('userInitial').innerText = (session.email || "U").charAt(0).toUpperCase();
+      document.getElementById('authContainer').classList.add('hidden'); 
+      document.getElementById('dashboardContainer').classList.remove('hidden'); 
+      loadAllSystemData();
     }
 
     async function loadAllSystemData() {
@@ -852,15 +883,17 @@
     function logout() { clearSession(); location.reload(); }
 
     function handleTransfer() {
-      let source = document.getElementById('transferSource').value; let target = document.getElementById('transferTarget').value; let amount = parseFloat(document.getElementById('transferAmount').value) || 0;
+      let source = document.getElementById('transferSource').value; 
+      let target = document.getElementById('transferTarget').value; 
+      let amount = parseFloat(document.getElementById('transferAmount').value) || 0;
       if (source === target || amount <= 0) { showCustomAlert("Gagal", "Validasi pemindahan dana tidak sesuai.", "error"); return; }
       executeTransfer(source, target, amount);
     }
 
     async function executeTransfer(source, target, amount) {
       if (isMockMode) {
-        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY));
-        pockets.forEach(p => { if (p.name === source) p.allocated -= amount; if (p.name === target) p.allocated += amount; p.remaining = p.allocated - p.spent; });
+        let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)) || [];
+        pockets.forEach(p => { if(p) { if (p.name === source) p.allocated -= amount; if (p.name === target) p.allocated += amount; p.remaining = p.allocated - p.spent; } });
         localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); showCustomAlert("Sukses", "Dana teralihkan.", "success"); loadAllSystemData();
       } else {
         let res = await executeCloudApi('transferPocketFunds', { sheetId: session.sheetId, source, target, amount });
@@ -869,8 +902,10 @@
     }
 
     async function createCustomPocket() {
-      let name = document.getElementById('pocketNewName').value.trim(); let percentage = parseFloat(document.getElementById('pocketNewPercentage').value) || 0;
-      let icon = document.getElementById('pocketNewIcon').value; let color = document.getElementById('pocketNewColor').value;
+      let name = document.getElementById('pocketNewName').value.trim(); 
+      let percentage = parseFloat(document.getElementById('pocketNewPercentage').value) || 0;
+      let icon = document.getElementById('pocketNewIcon').value; 
+      let color = document.getElementById('pocketNewColor').value;
       if (!name || percentage <= 0) return;
 
       if (isMockMode) {
@@ -885,10 +920,24 @@
 
     function resetPageAndFilter() { currentPage = 1; filterTransactions(); }
 
+    // DETEKSI DAN PROTEKSI ANTI CRASH .toLowerCase() PADA DATA KOSONG SPREADSHEET
     function filterTransactions() {
-      let query = document.getElementById('txSearch').value.toLowerCase(); let typeFilter = document.getElementById('txFilterType').value;
+      let searchInput = document.getElementById('txSearch');
+      let query = searchInput ? searchInput.value.toString().toLowerCase() : "";
+      let typeFilter = document.getElementById('txFilterType').value;
       let tbody = document.getElementById('transactionTableBody'); if (!tbody) return; tbody.innerHTML = "";
-      let filtered = globalTransactions.filter(t => (t.notes.toLowerCase().includes(query) || t.pocket.toLowerCase().includes(query)) && (typeFilter === "Semua" || t.type === typeFilter));
+      
+      let filtered = globalTransactions.filter(t => {
+        if (!t) return false;
+        // Penanganan Ultra Aman Null Pointer Check
+        let noteText = t.notes ? t.notes.toString().toLowerCase() : "";
+        let pocketText = t.pocket ? t.pocket.toString().toLowerCase() : "";
+        
+        let matchQuery = noteText.includes(query) || pocketText.includes(query);
+        let matchType = typeFilter === "Semua" || t.type === typeFilter;
+        return matchQuery && matchType;
+      });
+      
       let totalPages = Math.ceil(filtered.length / rowsPerPage); renderPaginationControls(totalPages);
 
       if (filtered.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-slate-500">Tidak ada riwayat</td></tr>`; return; }
@@ -898,9 +947,9 @@
           <tr class="hover:bg-slate-500/5">
             <td class="py-2 px-3 font-monospace border-r border-slate-500/10">${formatDateTimeConsistent(t.date)}</td>
             <td class="py-2 px-3 border-r border-slate-500/10">${t.type === "Pemasukan" ? "📈 MASUK" : "📉 KELUAR"}</td>
-            <td class="py-2 px-3 font-bold text-slate-400 border-r border-slate-500/10">${t.pocket}</td>
+            <td class="py-2 px-3 font-bold text-slate-400 border-r border-slate-500/10">${t.pocket || '-'}</td>
             <td class="py-2 px-3 text-right font-bold border-r border-slate-500/10 ${t.type === "Pemasukan" ? "text-emerald-400" : "text-pink-500"}">${formatRupiah(t.amount)}</td>
-            <td class="py-2 px-3 border-r border-slate-500/10 truncate max-w-xs">${t.notes}</td>
+            <td class="py-2 px-3 border-r border-slate-500/10 truncate max-w-xs">${t.notes || '-'}</td>
             <td class="py-2 px-3 text-center">
               <button onclick="openEditTransactionModal(${t.index})" class="text-blue-500 mx-1 p-1 hover:border-blue-500 border border-transparent rounded"><i class="fa-solid fa-edit"></i></button>
               <button onclick="handleDeleteTransaction(${t.index})" class="text-red-500 mx-1 p-1 hover:border-red-500 border border-transparent rounded"><i class="fa-solid fa-trash"></i></button>
@@ -929,7 +978,8 @@
       let tTgt = document.getElementById('transferTarget'); tTgt.innerHTML = "";
       
       globalPockets.forEach(p => {
-        totalBalance += (p.allocated - p.spent);
+        if(!p) return;
+        totalBalance += ((p.allocated || 0) - (p.spent || 0));
         let pctUsed = p.allocated > 0 ? (p.spent / p.allocated) * 100 : 0;
         let isInvest = isInvestmentPocket(p.name);
         let barColor = isInvest ? '#10b981' : (p.spent > p.allocated ? '#ef4444' : p.color);
@@ -970,21 +1020,27 @@
       });
 
       document.getElementById('metricTotalBalance').innerText = formatRupiah(totalBalance);
-      let totalAllocatedSum = globalPockets.reduce((sum, p) => sum + p.allocated, 0);
-      let totalSpentSum = globalPockets.reduce((sum, p) => sum + p.spent, 0);
+      let totalAllocatedSum = globalPockets.reduce((sum, p) => sum + (p ? (p.allocated || 0) : 0), 0);
+      let totalSpentSum = globalPockets.reduce((sum, p) => sum + (p ? (p.spent || 0) : 0), 0);
       document.getElementById('statTotalBudget').innerText = formatRupiah(totalAllocatedSum);
       document.getElementById('statTotalActual').innerText = formatRupiah(totalSpentSum);
       document.getElementById('statUtilRate').innerText = (totalAllocatedSum > 0 ? (totalSpentSum / totalAllocatedSum) * 100 : 0).toFixed(1) + "%";
 
-      let totalPercent = globalPockets.reduce((sum, p) => sum + p.percentage, 0);
+      let totalPercent = globalPockets.reduce((sum, p) => sum + (p ? (p.percentage || 0) : 0), 0);
       document.getElementById('metricTotalPercent').innerText = `${totalPercent}% / 100%`;
 
-      let tIn = globalTransactions.filter(t => t.type === "Pemasukan").reduce((sum, t) => sum + t.amount, 0);
-      let tOut = globalTransactions.filter(t => t.type === "Pengeluaran").reduce((sum, t) => sum + t.amount, 0);
+      let tIn = globalTransactions.filter(t => t && t.type === "Pemasukan").reduce((sum, t) => sum + t.amount, 0);
+      let tOut = globalTransactions.filter(t => t && t.type === "Pengeluaran").reduce((sum, t) => sum + t.amount, 0);
       document.getElementById('metricTotalIncome').innerText = formatRupiah(tIn);
       document.getElementById('metricTotalExpense').innerText = formatRupiah(tOut);
 
       filterTransactions(); renderAnalyticsChart();
+    }
+
+    // PROTEKSI EMAIL LOWERCASE PADA DATA MOCK LOKAL JIKA TERJADI PERUBAHAN VERSI
+    function checkUserMockMatch(u, email, hashed) {
+      if(!u || !u.email) return false;
+      return u.email.toString().toLowerCase() === email.toString().toLowerCase() && u.password === hashed;
     }
 
     function renderAnalyticsChart() {
@@ -994,10 +1050,10 @@
       donutChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: globalPockets.map(p => p.name),
+          labels: globalPockets.map(p => p ? p.name : ""),
           datasets: [
-            { label: 'Budget', data: globalPockets.map(p => p.allocated), backgroundColor: '#3b82f6', borderRadius: 4 },
-            { label: 'Realisasi', data: globalPockets.map(p => p.spent), backgroundColor: '#f43f5e', borderRadius: 4 }
+            { label: 'Budget', data: globalPockets.map(p => p ? p.allocated : 0), backgroundColor: '#3b82f6', borderRadius: 4 },
+            { label: 'Realisasi', data: globalPockets.map(p => p ? p.spent : 0), backgroundColor: '#f43f5e', borderRadius: 4 }
           ]
         },
         options: { 
@@ -1035,12 +1091,15 @@
 
       if (isMockMode) {
         setTimeout(() => {
-          let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)); let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
+          let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)) || []; 
+          let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY)) || [];
           transactions.unshift({ index: transactions.length + 1, date: new Date().toISOString(), type: selectedFormType, pocket: (selectedFormType === "Pemasukan") ? "Semua" : pocket, amount: parseFloat(amount), notes: notes || "-" });
           pockets.forEach(p => {
-            if (selectedFormType === "Pemasukan") p.allocated += parseFloat(amount) * (p.percentage / 100);
-            else if (p.name === pocket) p.spent += parseFloat(amount);
-            p.remaining = p.allocated - p.spent;
+            if(p) {
+              if (selectedFormType === "Pemasukan") p.allocated += parseFloat(amount) * ((p.percentage || 0) / 100);
+              else if (p.name === pocket) p.spent += parseFloat(amount);
+              p.remaining = p.allocated - p.spent;
+            }
           });
           localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
           
@@ -1061,35 +1120,20 @@
     }
 
     function switchTab(tabId) {
-      // Hide all content tabs
       document.querySelectorAll('.tab-content').forEach(s => s.classList.add('hidden'));
-      
-      // Update Desktop Sidebar active states
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      if(document.getElementById(`btn-${tabId}`)) {
-         document.getElementById(`btn-${tabId}`).classList.add('active');
-      }
+      if(document.getElementById(`btn-${tabId}`)) { document.getElementById(`btn-${tabId}`).classList.add('active'); }
 
-      // Update Mobile Bottom Nav active states
-      document.querySelectorAll('.mobile-nav-btn').forEach(b => {
-         b.classList.remove('active');
-      });
-      if(document.getElementById(`btn-mob-${tabId}`)) {
-         document.getElementById(`btn-mob-${tabId}`).classList.add('active');
-      }
+      document.querySelectorAll('.mobile-nav-btn').forEach(b => { b.classList.remove('active'); });
+      if(document.getElementById(`btn-mob-${tabId}`)) { document.getElementById(`btn-mob-${tabId}`).classList.add('active'); }
 
-      // Show selected tab content
       document.getElementById(tabId).classList.remove('hidden');
-      
       const titles = { 'tab-dashboard': 'IKHTISAR SAKU', 'tab-transactions': 'BUKU RIWAYAT', 'tab-pockets': 'KELOLA KANTONG', 'tab-transfer': 'KIRIM SALDO' };
       document.getElementById('pageTitle').innerText = titles[tabId];
       
-      // Auto-close sidebar on mobile if it's open
       if (window.innerWidth < 1024) {
          const sidebar = document.getElementById('sidebar');
-         if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
-            toggleMobileSidebar();
-         }
+         if (sidebar && !sidebar.classList.contains('-translate-x-full')) { toggleMobileSidebar(); }
       }
     }
 
@@ -1114,8 +1158,8 @@
       
       if (isMockMode) {
         setTimeout(() => {
-          let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY));
-          let match = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === hashed);
+          let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY)) || [];
+          let match = users.find(u => checkUserMockMatch(u, email, hashed));
           if (match) { session.sheetId = match.sheetId; session.email = match.email; saveSession(session.sheetId, session.email); setupUIOnLogin(); }
           else { document.getElementById('authMessage').innerText = ""; showCustomAlert("Gagal", "Email/Password salah.", "error"); }
         }, 800);
@@ -1135,7 +1179,8 @@
       if (isMockMode) {
         setTimeout(() => {
           let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY)) || [];
-          if(users.find(u => u.email.toLowerCase() === email.toLowerCase())) { document.getElementById('authMessage').innerText = ""; showCustomAlert("Gagal", "Email sudah ada.", "error"); return; }
+          let exists = users.find(u => u && u.email && u.email.toString().toLowerCase() === email.toLowerCase());
+          if(exists) { document.getElementById('authMessage').innerText = ""; showCustomAlert("Gagal", "Email sudah ada.", "error"); return; }
           users.push({ email, password: hashed, sheetId: "MOCK_" + Date.now(), otp: "" });
           localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users));
           document.getElementById('authMessage').innerText = ""; showCustomAlert("Sukses", "Akun demo siap, silakan login.", "success"); switchAuthState('login');
@@ -1154,7 +1199,7 @@
       
       if (isMockMode) {
         let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY)) || [];
-        let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+        let user = users.find(u => u && u.email && u.email.toString().toLowerCase() === email.toLowerCase());
         if (user) { user.otp = "123456"; localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users)); showCustomAlert("Demo", "OTP Lokal: 123456", "success"); switchAuthState('reset'); }
       } else {
         let res = await executeCloudApi('forgotPassword', { email });
@@ -1171,7 +1216,7 @@
 
       if (isMockMode) {
         let users = JSON.parse(localStorage.getItem(MOCK_USERS_KEY)) || [];
-        let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+        let user = users.find(u => u && u.email && u.email.toString().toLowerCase() === email.toLowerCase());
         if (user && user.otp === otp) { user.password = hashed; user.otp = ""; localStorage.setItem(MOCK_USERS_KEY, JSON.stringify(users)); switchAuthState('login'); }
       } else {
         let res = await executeCloudApi('resetPasswordWithCode', { email, otpCode: otp, newPassword: hashed });
@@ -1182,16 +1227,19 @@
     async function handleDeleteTransaction(txIndex) {
       showCustomConfirm("Hapus?", "Hapus transaksi ini?", async function() {
         if (isMockMode) {
-          let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)); let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY));
-          let tx = transactions.find(t => t.index === txIndex);
-          if (tx.type === "Pemasukan") pockets.forEach(p => { p.allocated -= tx.amount * (p.percentage / 100); });
-          else pockets.forEach(p => { if (p.name === tx.pocket) p.spent -= tx.amount; p.remaining = p.allocated - p.spent; });
-          transactions = transactions.filter(t => t.index !== txIndex);
-          localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
-          loadAllSystemData(); showCustomAlert("Sukses", "Transaksi dihapus.", "success");
+          let pockets = JSON.parse(localStorage.getItem(MOCK_POCKETS_KEY)) || []; 
+          let transactions = JSON.parse(localStorage.getItem(MOCK_TRANSACTIONS_KEY)) || [];
+          let tx = transactions.find(t => t && t.index === txIndex);
+          if(tx) {
+            if (tx.type === "Pemasukan") pockets.forEach(p => { if(p) p.allocated -= tx.amount * ((p.percentage || 0) / 100); });
+            else pockets.forEach(p => { if (p && p.name === tx.pocket) p.spent -= tx.amount; if(p) p.remaining = p.allocated - p.spent; });
+            transactions = transactions.filter(t => t && t.index !== txIndex);
+            localStorage.setItem(MOCK_POCKETS_KEY, JSON.stringify(pockets)); localStorage.setItem(MOCK_TRANSACTIONS_KEY, JSON.stringify(transactions));
+          }
+          loadAllSystemData();
         } else {
           let res = await executeCloudApi('deleteTransaction', { sheetId: session.sheetId, txIndex });
-          if (res && res.success) { loadAllSystemData(); showCustomAlert("Sukses", "Transaksi dihapus.", "success"); }
+          if (res && res.success) loadAllSystemData();
         }
       });
     }
@@ -1200,7 +1248,6 @@
       document.getElementById('currentDate').innerText = new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
       initTheme(); setFormType('Pemasukan');
       
-      // Initialize active tab on bottom nav specifically
       document.getElementById('btn-mob-tab-dashboard').classList.add('active');
 
       if (restoreSession()) setupUIOnLogin();
